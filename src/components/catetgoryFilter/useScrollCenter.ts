@@ -1,7 +1,7 @@
 import { useLayoutEffect } from "react"
 
 interface UseScrollCenterProperties {
-  ref: React.RefObject<HTMLUListElement>
+  ref: React.RefObject<HTMLUListElement | null>
   targetId: string
 }
 

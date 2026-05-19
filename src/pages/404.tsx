@@ -18,7 +18,7 @@ const NotFound = () => {
   const canvasReference = useRef<HTMLCanvasElement>(null)
   const [particles, setParticles] = useState<GlowParticle[]>([])
   const isCreated = useRef(false)
-  const requestReference = useRef<number>()
+  const requestReference = useRef<number | undefined>(undefined)
 
   useLayoutEffect(() => {
     const canvasObject = canvasReference.current

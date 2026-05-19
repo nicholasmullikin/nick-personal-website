@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
@@ -18,7 +18,7 @@ const Home = ({
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const filteredPostData = currentCategory
       ? postData.filter(
           ({ node }) => node?.frontmatter?.category === currentCategory,

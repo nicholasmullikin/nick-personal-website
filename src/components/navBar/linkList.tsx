@@ -1,8 +1,6 @@
 import React from "react"
 
 import { Link } from "gatsby"
-import { isNil } from "lodash"
-
 import type { UseSiteMetaDataReturnType } from "~/src/hooks/useSiteMetadata"
 
 import type { UseMenuReturnType } from "./useMenu"
@@ -19,12 +17,12 @@ const LinkList: React.FC<LinkListProperties> = ({ links, setToggle }) => {
   const generateLink = (
     properties: Queries.SiteSiteMetadataMenuLinks | null,
   ) => {
-    if (isNil(properties)) {
+    if (properties == null) {
       return
     }
 
     const { link, name } = properties
-    const safeLink = isNil(link) ? "" : link
+    const safeLink = link == null ? "" : link
     const isExternalLink = EXTERNAL_LINK_EXP.test(safeLink)
     if (safeLink === ROOT) {
       return (

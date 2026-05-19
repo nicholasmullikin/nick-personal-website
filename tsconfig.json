@@ -16,5 +16,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "public",
+    ".cache",
+    "src/components/map2.tsx",
+    "src/components/map3.tsx",
+    "src/components/map4.tsx"
+  ]
 }

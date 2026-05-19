@@ -20,6 +20,7 @@ const Comment = () => {
 
   useEffect(() => {
     if (!repo) return
+
     let themeMode: ThemeMode
 
     if (isUtterancesCreated.current) {
@@ -47,20 +48,52 @@ const Comment = () => {
       isUtterancesCreated.current = true
     }
 
-    const utterancesElement = containerReference.current?.querySelector(
-      utterancesSelector,
-    ) as HTMLIFrameElement
-
-    const postThemeMessage = () => {
-      if (!utterancesElement) return
+    const postThemeMessage = (iframe: HTMLIFrameElement) => {
       const message = {
         type: "set-theme",
         theme: themeMode,
       }
-      utterancesElement?.contentWindow?.postMessage(message, source)
+      // Until the iframe has navigated to utteranc.es, its browsing context is
+      // same-origin (e.g. localhost); postMessage with a strict target origin
+      // fails. `*` is what Utterances documents for theme sync from the parent.
+      iframe.contentWindow?.postMessage(message, "*")
     }
 
-    isUtterancesCreated.current ? postThemeMessage() : createUtterancesElement()
+    const bindIframe = (iframe: HTMLIFrameElement) => {
+      const onLoad = () => postThemeMessage(iframe)
+      iframe.addEventListener("load", onLoad)
+      queueMicrotask(onLoad)
+      return () => iframe.removeEventListener("load", onLoad)
+    }
+
+    if (!isUtterancesCreated.current) {
+      createUtterancesElement()
+    }
+
+    const iframe = containerReference.current?.querySelector(
+      utterancesSelector,
+    ) as HTMLIFrameElement | null
+
+    if (!iframe) {
+      const root = containerReference.current
+      if (!root) return
+      let unbindIframe: (() => void) | undefined
+      const observer = new MutationObserver(() => {
+        const el = root.querySelector(
+          utterancesSelector,
+        ) as HTMLIFrameElement | null
+        if (!el) return
+        observer.disconnect()
+        unbindIframe = bindIframe(el)
+      })
+      observer.observe(root, { childList: true, subtree: true })
+      return () => {
+        observer.disconnect()
+        unbindIframe?.()
+      }
+    }
+
+    return bindIframe(iframe)
   }, [repo, theme])
 
   return <div ref={containerReference} />

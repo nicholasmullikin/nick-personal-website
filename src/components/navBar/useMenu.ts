@@ -5,19 +5,20 @@ import disableScroll from "disable-scroll"
 import type styledTheme from "~/src/styles/styledTheme"
 
 interface UseMenuProperties {
-  navRef: React.RefObject<HTMLElement> | null
-  curtainRef: React.RefObject<HTMLDivElement> | null
-  listRef: React.RefObject<HTMLUListElement> | null
+  navRef: React.RefObject<HTMLElement | null>
+  curtainRef: React.RefObject<HTMLDivElement | null>
+  listRef: React.RefObject<HTMLUListElement | null>
   device: (typeof styledTheme)["device"]
 }
 
-interface NonNullableReference<Type>
-  extends NonNullable<React.RefObject<Type>> {
+interface NonNullableReference<Type> extends NonNullable<
+  React.RefObject<Type>
+> {
   current: Type
 }
 
 const isNonNullableReference = <Type>(
-  reference: React.RefObject<Type> | null,
+  reference: React.RefObject<Type | null> | null,
 ): reference is NonNullableReference<Type> => !!(reference && reference.current)
 
 const FOCUSABLE_TABINDEX = 0
@@ -33,7 +34,7 @@ const useMenu = ({
   device,
 }: UseMenuProperties) => {
   const [toggle, setToggle] = useState(false)
-  const mql = useRef<MediaQueryList>()
+  const mql = useRef<MediaQueryList | undefined>(undefined)
 
   const handleClick = () =>
     toggle === true ? setToggle(false) : setToggle(true)

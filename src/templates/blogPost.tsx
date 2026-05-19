@@ -1,27 +1,24 @@
-import React, { Suspense } from "react"
+import React, { type FC } from "react"
 
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
 import Comment from "~/src/components/comment"
-import { Map } from "~/src/components/map"
 import SEO from "~/src/components/seo"
 import Layout from "~/src/layouts/layout"
 import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
+// import { Map1 } from "~/src/components/map"
 
-
-const BlogPost: React.FC<PageProps<Queries.Query>> = ({ data }) => {
+const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
   const { markdownRemark } = data
   const { frontmatter, html } = markdownRemark!
   const { title, desc, thumbnail, date, category } = frontmatter!
 
   const ogImagePath =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    thumbnail &&
-    thumbnail?.childImageSharp?.gatsbyImageData!.images!.fallback!.src
+    thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback?.src
 
   return (
     <Layout>
@@ -44,9 +41,9 @@ const BlogPost: React.FC<PageProps<Queries.Query>> = ({ data }) => {
                   dangerouslySetInnerHTML={{ __html: html ?? "" }}
                   rhythm={rhythm}
                 />
-                <Suspense fallback={<></>}>
-                  <Map />
-                </Suspense>
+                {/* <Suspense fallback={<></>}>
+                  <Map1 />
+                </Suspense> */}
               </div>
             </InnerWrapper>
           </OuterWrapper>

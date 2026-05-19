@@ -1,3 +1,4 @@
+const ReactDOM = require("react-dom")
 const meta = require("./gatsby-meta-config")
 
 const siteMetadata = {
@@ -189,6 +190,7 @@ exports.replaceHydrateFunction = () => {
 
 module.exports = {
   graphqlTypegen: true,
+  jsxRuntime: "automatic",
   siteMetadata,
   flags: {
     DEV_SSR: true,
@@ -200,5 +202,6 @@ module.exports = {
     ...markdownPlugins,
     ...searchPlugins,
     ...pwaPlugins,
+    `gatsby-plugin-pnpm-gatsby-5`,
   ],
 }
