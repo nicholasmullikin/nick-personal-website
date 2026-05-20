@@ -1,8 +1,11 @@
 const React = require("react")
+const meta = require("./gatsby-meta-config")
 
-exports.onRenderBody = ({ setPreBodyComponents }) => {
+exports.onRenderBody = ({ setHtmlAttributes, setPreBodyComponents }) => {
+  setHtmlAttributes({ lang: meta.lang || "en" })
   setPreBodyComponents([
     React.createElement("script", {
+      key: "theme-init",
       dangerouslySetInnerHTML: {
         __html: `
           (() => {    

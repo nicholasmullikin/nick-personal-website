@@ -1,130 +1,98 @@
-// react
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
-// openlayers
-
-import Map from "ol/Map"
-import View from "ol/View"
+import Feature from "ol/Feature"
+import Geometry from "ol/geom/Geometry"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
+import Map from "ol/Map"
+import { toStringXY } from "ol/coordinate"
+import { transform } from "ol/proj"
 import VectorSource from "ol/source/Vector"
 import XYZ from "ol/source/XYZ"
-import { transform } from "ol/proj"
-import { toStringXY } from "ol/coordinate"
-import Geometry from "ol/geom/Geometry"
-import Feature from "ol/Feature"
-import MapBrowserEvent from "ol/MapBrowserEvent"
+import View from "ol/View"
 
-function MapWrapper(props: { features: Feature<Geometry>[] }) {
-  // set intial state
+import "ol/ol.css"
+
+type FeatureSource = VectorSource<Feature<Geometry>>
+
+interface Map2Properties {
+  features?: Feature<Geometry>[]
+}
+
+function Map2({ features = [] }: Map2Properties) {
   const [map, setMap] = useState<Map | null>(null)
   const [featuresLayer, setFeaturesLayer] =
-    useState<VectorLayer<Feature<Geometry>>>()
+    useState<VectorLayer<FeatureSource> | null>(null)
   const [selectedCoord, setSelectedCoord] = useState<number[] | null>(null)
 
-  // pull refs
   const mapElement = useRef<HTMLDivElement>(null)
-
-  // create state ref that can be accessed in OpenLayers onclick callback function
-  //  https://stackoverflow.com/a/60643670
   const mapRef = useRef<Map | null>(null)
   mapRef.current = map
 
-  // initialize map on first render - logic formerly put into componentDidMount
   useEffect(() => {
-    // create and add vector source layer
-    const initalFeaturesLayer = new VectorLayer({
-      source: new VectorSource(),
+    if (!mapElement.current) return
+
+    const initalFeaturesLayer = new VectorLayer<FeatureSource>({
+      source: new VectorSource<Feature<Geometry>>(),
     })
-    if (mapElement.current) {
-      // create map
-      const initialMap = new Map({
-        target: mapElement.current,
-        layers: [
-          // USGS Topo
-          new TileLayer({
-            source: new XYZ({
-              url: "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}",
-            }),
+
+    const initialMap = new Map({
+      target: mapElement.current,
+      layers: [
+        new TileLayer({
+          source: new XYZ({
+            url: "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}",
           }),
-
-          // Google Maps Terrain
-          /* new TileLayer({
-            source: new XYZ({
-              url: 'http://mt0.google.com/vt/lyrs=p&hl=en&x={x}&y={y}&z={z}',
-            })
-          }), */
-
-          initalFeaturesLayer,
-        ],
-        view: new View({
-          projection: "EPSG:3857",
-          center: [0, 0],
-          zoom: 2,
         }),
-        controls: [],
-      })
+        initalFeaturesLayer,
+      ],
+      view: new View({
+        projection: "EPSG:3857",
+        center: [0, 0],
+        zoom: 2,
+      }),
+      controls: [],
+    })
 
-      // set map onclick handler
-      initialMap.on("click", handleMapClick)
+    const handleMapClick = (event: { pixel: import("ol/pixel").Pixel }) => {
+      if (!mapRef.current) return
+      const clickedCoord = mapRef.current.getCoordinateFromPixel(event.pixel)
+      const transformedCoord = transform(clickedCoord, "EPSG:3857", "EPSG:4326")
+      setSelectedCoord(transformedCoord)
+    }
 
-      // save map and vector layer references to state
-      setMap(initialMap)
-      setFeaturesLayer(initalFeaturesLayer)
+    initialMap.on("click", handleMapClick)
+    setMap(initialMap)
+    setFeaturesLayer(initalFeaturesLayer)
+
+    return () => {
+      initialMap.setTarget(undefined)
     }
   }, [])
 
-  // update map if features prop changes - logic formerly put into componentDidUpdate
   useEffect(() => {
-    if (props.features?.length && featuresLayer != null && map) {
-      // may be null on first render
-
-      // set features to map
-      featuresLayer.setSource(
-        new VectorSource({
-          features: props.features, // make sure features is an array
-        }),
-      )
-
-      const featureSource = featuresLayer.getSource()
-      if (featureSource !== null) {
-        // fit map to feature extent (with 100px of padding)
-        map.getView().fit(featureSource.getExtent(), {
-          padding: [100, 100, 100, 100],
-        })
-      }
+    if (!map || !featuresLayer || features.length === 0) return
+    featuresLayer.setSource(new VectorSource<Feature<Geometry>>({ features }))
+    const source = featuresLayer.getSource()
+    const extent = source?.getExtent()
+    if (extent) {
+      map.getView().fit(extent, { padding: [100, 100, 100, 100] })
     }
-  }, [props.features])
+  }, [features, featuresLayer, map])
 
-  // map click handler
-  const handleMapClick = (event: MapBrowserEvent<MouseEvent>) => {
-    if (mapRef.current) {
-      // get clicked coordinate using mapRef to access current React state inside OpenLayers callback
-      //  https://stackoverflow.com/a/60643670
-      const clickedCoord = mapRef.current.getCoordinateFromPixel(event.pixel)
-
-      // transform coord to EPSG 4326 standard Lat Long
-      const transormedCoord = transform(clickedCoord, "EPSG:3857", "EPSG:4326")
-
-      // set React state
-      setSelectedCoord(transormedCoord)
-    }
-  }
-
-  // render component
   return (
-    <div style={{ height: "300px" }}>
+    <div style={{ width: "100%" }}>
       <div
         ref={mapElement}
-        className="map-container"
-        style={{ height: "300px" }}
-      ></div>
-
-      <div className="clicked-coord-label">
-        <p>{selectedCoord ? toStringXY(selectedCoord, 5) : ""}</p>
-      </div>
+        style={{ width: "100%", height: "400px", borderRadius: 8 }}
+      />
+      <p style={{ marginTop: 8, fontSize: 14 }}>
+        Click to log lat/lng:{" "}
+        <code>{selectedCoord ? toStringXY(selectedCoord, 5) : "—"}</code>
+      </p>
     </div>
   )
 }
 
-export default MapWrapper
+export default Map2
+export { Map2 }

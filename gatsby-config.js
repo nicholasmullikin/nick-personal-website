@@ -61,7 +61,6 @@ const devPlugins = [
       pathToConfigModule: "src/styles/typography",
     },
   },
-  "gatsby-plugin-react-helmet",
   "gatsby-plugin-typescript",
   "gatsby-plugin-styled-components",
 ]

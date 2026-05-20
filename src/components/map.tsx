@@ -1,17 +1,18 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 
-import { Environment, OrbitControls, Stats } from "@react-three/drei"
+import { Environment, OrbitControls } from "@react-three/drei"
 import { Canvas, useFrame } from "@react-three/fiber"
+import Map from "ol/Map"
+import View from "ol/View"
+import TileLayer from "ol/layer/Tile"
+import XYZ from "ol/source/XYZ"
 import * as THREE from "three"
 import type { Mesh } from "three"
-import Map from "ol/Map"
-import TileLayer from "ol/layer/Tile"
-import View from "ol/View"
-import XYZ from "ol/source/XYZ"
+
 import "ol/ol.css"
 
-const OL_WIDTH = 1000
-const OL_HEIGHT = 500
+const OL_WIDTH = 1024
+const OL_HEIGHT = 512
 
 const hiddenMapStyle: React.CSSProperties = {
   position: "fixed",
@@ -19,8 +20,7 @@ const hiddenMapStyle: React.CSSProperties = {
   left: 0,
   width: OL_WIDTH,
   height: OL_HEIGHT,
-  overflow: "hidden",
-  clipPath: "inset(100%)",
+  visibility: "hidden",
   pointerEvents: "none",
   zIndex: -1,
 }
@@ -32,9 +32,10 @@ function Earth({ olCanvas }: { olCanvas: HTMLCanvasElement | null }) {
   useEffect(() => {
     if (!olCanvas) return
     const tex = new THREE.CanvasTexture(olCanvas)
+    tex.colorSpace = THREE.SRGBColorSpace
     textureRef.current = tex
     if (meshRef.current) {
-      const mat = meshRef.current.material as THREE.MeshBasicMaterial
+      const mat = meshRef.current.material as THREE.MeshStandardMaterial
       mat.map = tex
       mat.needsUpdate = true
     }
@@ -44,35 +45,16 @@ function Earth({ olCanvas }: { olCanvas: HTMLCanvasElement | null }) {
     }
   }, [olCanvas])
 
-  useFrame(() => {
-    if (textureRef.current) {
-      textureRef.current.needsUpdate = true
-    }
+  useFrame((_, delta) => {
+    if (textureRef.current) textureRef.current.needsUpdate = true
+    if (meshRef.current) meshRef.current.rotation.y += delta / 30
   })
 
   return (
-    <>
-      <Environment files="/img/venice_sunset_1k.hdr" />
-      <directionalLight
-        intensity={Math.PI}
-        position={[4, 0, 2]}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-left={-2}
-        shadow-camera-right={2}
-        shadow-camera-top={-2}
-        shadow-camera-bottom={2}
-        shadow-camera-near={0.1}
-        shadow-camera-far={7}
-      />
-      <mesh ref={meshRef} castShadow receiveShadow>
-        <sphereGeometry args={[90, 64, 64]} />
-        <meshBasicMaterial />
-      </mesh>
-      <OrbitControls />
-      <Stats />
-    </>
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <sphereGeometry args={[1, 64, 64]} />
+      <meshStandardMaterial roughness={0.7} metalness={0.1} />
+    </mesh>
   )
 }
 
@@ -98,21 +80,23 @@ export function Map1() {
         projection: "EPSG:4326",
         extent: [-180, -90, 180, 90],
         center: [0, 0],
-        zoom: 2,
+        zoom: 1,
       }),
       controls: [],
     })
 
     mapRef.current = olMap
 
-    olMap.on("rendercomplete", () => {
+    const grabCanvas = () => {
       const canvas = olMap
         .getViewport()
         .querySelector<HTMLCanvasElement>(".ol-layer canvas")
       if (canvas && canvas.width > 0 && canvas.height > 0) {
-        setOlCanvas(prev => (prev === canvas ? prev : canvas))
+        setOlCanvas(previous => (previous === canvas ? previous : canvas))
       }
-    })
+    }
+    olMap.on("rendercomplete", grabCanvas)
+    olMap.once("postrender", grabCanvas)
 
     return () => {
       olMap.setTarget(undefined)
@@ -120,25 +104,35 @@ export function Map1() {
     }
   }, [])
 
-  if (typeof window === "undefined") {
-    return null
-  }
+  if (typeof window === "undefined") return null
 
   return (
-    <>
-      <div ref={mapDivRef} aria-hidden style={hiddenMapStyle} />
-      <div style={{ height: "400px" }}>
-        <Canvas
-          camera={{ position: [0, 0, 100] }}
-          gl={{ antialias: true }}
-          onCreated={({ gl }) => {
-            gl.shadowMap.enabled = true
-            gl.shadowMap.type = THREE.PCFShadowMap
-          }}
-        >
+    <div style={{ width: "100%", height: "400px" }}>
+      <div
+        ref={mapDivRef}
+        aria-hidden
+        style={hiddenMapStyle}
+        data-testid="ol-source-map"
+      />
+      <Canvas
+        shadows="percentage"
+        camera={{ position: [0, 0, 3], fov: 50 }}
+        gl={{ antialias: true }}
+      >
+        <Suspense fallback={null}>
+          <Environment files="/img/venice_sunset_1k.hdr" />
+          <ambientLight intensity={0.4} />
+          <directionalLight
+            intensity={1.5}
+            position={[4, 2, 2]}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+          />
           <Earth olCanvas={olCanvas} />
-        </Canvas>
-      </div>
-    </>
+          <OrbitControls />
+        </Suspense>
+      </Canvas>
+    </div>
   )
 }

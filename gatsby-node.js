@@ -1,5 +1,4 @@
 const path = require(`path`)
-const webpack = require("webpack")
 const _ = require("lodash")
 const { createFilePath } = require(`gatsby-source-filesystem`)
 
@@ -81,11 +80,6 @@ exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
           },
         ],
       },
-      plugins: [
-        new webpack.ProvidePlugin({
-          React: "react",
-        }),
-      ],
     })
   }
 }

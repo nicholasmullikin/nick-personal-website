@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react"
 
+import { type HeadFC } from "gatsby"
 import styled from "styled-components"
 
 import SEO from "~/src/components/seo"
@@ -94,7 +95,6 @@ const NotFound = () => {
 
   return (
     <Layout>
-      <SEO title="Not found" />
       <Container>
         <TitleWrap>
           <Title>404</Title>
@@ -149,3 +149,5 @@ const Canvas = styled.canvas`
 `
 
 export default NotFound
+
+export const Head: HeadFC = () => <SEO title="Not found" />

@@ -1,6 +1,6 @@
-import React, { type FC } from "react"
+import React, { type FC, Suspense } from "react"
 
-import { type PageProps, graphql } from "gatsby"
+import { type HeadFC, type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
 import Comment from "~/src/components/comment"
@@ -10,19 +10,28 @@ import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
-// import { Map1 } from "~/src/components/map"
+
+const MapsBlockLazy = React.lazy(() => import("~/src/components/mapsBlock"))
+
+const MapsBlock: FC<{ slug: string }> = ({ slug }) => {
+  if (slug !== "/blog/maps/") return null
+  if (typeof window === "undefined") return null
+
+  return (
+    <Suspense fallback={null}>
+      <MapsBlockLazy />
+    </Suspense>
+  )
+}
 
 const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
   const { markdownRemark } = data
-  const { frontmatter, html } = markdownRemark!
-  const { title, desc, thumbnail, date, category } = frontmatter!
-
-  const ogImagePath =
-    thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback?.src
+  const { frontmatter, html, fields } = markdownRemark!
+  const { title, desc, date, category } = frontmatter!
+  const slug = fields?.slug ?? ""
 
   return (
     <Layout>
-      <SEO title={title} desc={desc} image={ogImagePath} />
       <main>
         <article>
           <OuterWrapper>
@@ -41,9 +50,7 @@ const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
                   dangerouslySetInnerHTML={{ __html: html ?? "" }}
                   rhythm={rhythm}
                 />
-                {/* <Suspense fallback={<></>}>
-                  <Map1 />
-                </Suspense> */}
+                <MapsBlock slug={slug} />
               </div>
             </InnerWrapper>
           </OuterWrapper>
@@ -138,6 +145,9 @@ export const query = graphql`
   query BlogPostPage($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
       html
+      fields {
+        slug
+      }
       frontmatter {
         title
         desc
@@ -154,3 +164,11 @@ export const query = graphql`
 `
 
 export default BlogPost
+
+export const Head: HeadFC<Queries.Query> = ({ data }) => {
+  const { frontmatter } = data.markdownRemark!
+  const { title, desc, thumbnail } = frontmatter!
+  const ogImagePath =
+    thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback?.src
+  return <SEO title={title} desc={desc} image={ogImagePath} />
+}

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { graphql, useStaticQuery } from "gatsby"
+import { type HeadFC, graphql, useStaticQuery } from "gatsby"
 import styled from "styled-components"
 
 import SEO from "~/src/components/seo"
@@ -26,7 +26,6 @@ const About = () => {
   const markdown = data.allMarkdownRemark.edges[0].node.html
   return (
     <Layout>
-      <SEO title="About" />
       <Container
         dangerouslySetInnerHTML={{ __html: markdown ?? "" }}
         rhythm={rhythm}
@@ -68,3 +67,5 @@ const Container = styled(Markdown).attrs({
 `
 
 export default About
+
+export const Head: HeadFC = () => <SEO title="About" />

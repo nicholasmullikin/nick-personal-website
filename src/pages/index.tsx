@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { type PageProps, graphql } from "gatsby"
+import { type HeadFC, type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
 import CategoryFilter from "~/src/components/catetgoryFilter"
@@ -52,7 +52,6 @@ const Home = ({
 
   return (
     <Layout>
-      <SEO title="Home" />
       <Main>
         <Content>
           <CategoryFilter categoryList={data.allMarkdownRemark.group} />
@@ -133,3 +132,5 @@ export const query = graphql`
 `
 
 export default Home
+
+export const Head: HeadFC = () => <SEO title="Home" />
