@@ -19,6 +19,7 @@
     "lint:fix": "pnpm lint --fix",
     "format": "prettier . --write --ignore-unknown",
     "typecheck": "tsc --noEmit",
+    "sync:harp": "bash scripts/sync-harp.sh",
     "semantic-release": "semantic-release",
     "lint-staged": "lint-staged",
     "pre-commit": "pnpm lint-staged",

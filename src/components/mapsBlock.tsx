@@ -7,6 +7,7 @@ import { Map1 } from "~/src/components/map"
 import Map2 from "~/src/components/map2"
 import { Map3 } from "~/src/components/map3"
 import { Map4 } from "~/src/components/map4"
+import { Map5 } from "~/src/components/map5"
 
 const SILENCED_THREE_WARNINGS = ["Clock: This module has been deprecated"]
 
@@ -52,6 +53,12 @@ const MapsBlock = () => {
         <h3>Map4 — MapLibre GL 3D vector tiles</h3>
         <Suspense fallback={<MapFallback />}>
           <Map4 />
+        </Suspense>
+      </Slot>
+      <Slot>
+        <h3>Map5 — harp.gl globe with terrain &amp; atmosphere</h3>
+        <Suspense fallback={<MapFallback />}>
+          <Map5 />
         </Suspense>
       </Slot>
     </Stack>

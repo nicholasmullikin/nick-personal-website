@@ -24,6 +24,7 @@ export default tseslint.config(
       "src/components/map2.tsx",
       "src/components/map3.tsx",
       "src/components/map4.tsx",
+      "static/harp/**",
       "**/gatsby-types.d.ts",
       "gatsby-config.js",
       "gatsby-node.js",

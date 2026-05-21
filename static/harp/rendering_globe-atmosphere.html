@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Webpack App</title>
+    <style>
+      body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+        font-weight: bold;
+        font-family: "Fira Sans", sans-serif;
+        text-align: center;
+      }
+
+      #mapCanvas {
+        position: absolute;
+        border: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+      }
+
+      #copyrightNotice {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background-color: #f0fef1;
+        z-index: 100;
+        padding: 2px 5px;
+        font-family: sans-serif;
+        font-size: 0.8em;
+        font-weight: normal;
+      }
+    </style>
+    <script>
+      ;(function () {
+        var token =
+          new URLSearchParams(location.search).get("mapbox_token") || ""
+        var PLACEHOLDER = "__GATSBY_MAPBOX_TOKEN__"
+        if (!token) {
+          console.warn(
+            "[harp demo] No mapbox_token in URL; tile requests will 401.",
+          )
+          return
+        }
+        var origFetch = window.fetch.bind(window)
+        window.fetch = function (input, init) {
+          if (typeof input === "string" && input.indexOf(PLACEHOLDER) !== -1) {
+            input = input.split(PLACEHOLDER).join(token)
+          } else if (
+            input &&
+            typeof input === "object" &&
+            input.url &&
+            input.url.indexOf(PLACEHOLDER) !== -1
+          ) {
+            input = new Request(input.url.split(PLACEHOLDER).join(token), input)
+          }
+          return origFetch(input, init)
+        }
+      })()
+    </script>
+    <script defer src="common_bundle.js"></script>
+    <script defer src="rendering_globe-atmosphere_bundle.js"></script>
+  </head>
+
+  <body>
+    <canvas id="mapCanvas"></canvas>
+    <div id="app"></div>
+    <div id="copyrightNotice"></div>
+  </body>
+</html>
