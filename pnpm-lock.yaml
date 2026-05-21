@@ -7,6 +7,7 @@ settings:
 overrides:
   "@types/react": ^19.2.14
   msgpackr: ^1.11.5
+  ordered-binary: ^1.5.3
 
 importers:
   .:
@@ -11351,10 +11352,10 @@ packages:
       }
     engines: { node: ">= 0.8.0" }
 
-  ordered-binary@1.5.1:
+  ordered-binary@1.6.1:
     resolution:
       {
-        integrity: sha512-5VyHfHY3cd0iza71JepYG50My+YUbrFtGoUz2ooEydPyPM7Aai/JW098juLr+RG6+rDJuzNNTsEQu2DZa1A41A==,
+        integrity: sha512-QkCdPooczexPLiXIrbVOPYkR3VO3T6v2OyKRkR1Xbhpy7/LAVXwahnRCgRp78Oe/Ehf0C/HATAxfSr6eA1oX+w==,
       }
 
   os-tmpdir@1.0.2:
@@ -23362,7 +23363,7 @@ snapshots:
       msgpackr: 1.11.12
       node-addon-api: 4.3.0
       node-gyp-build-optional-packages: 5.0.3
-      ordered-binary: 1.5.1
+      ordered-binary: 1.6.1
       weak-lru-cache: 1.2.2
     optionalDependencies:
       "@lmdb/lmdb-darwin-arm64": 2.5.2
@@ -23377,7 +23378,7 @@ snapshots:
       msgpackr: 1.11.12
       node-addon-api: 4.3.0
       node-gyp-build-optional-packages: 5.0.3
-      ordered-binary: 1.5.1
+      ordered-binary: 1.6.1
       weak-lru-cache: 1.2.2
     optionalDependencies:
       "@lmdb/lmdb-darwin-arm64": 2.5.3
@@ -24205,7 +24206,7 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  ordered-binary@1.5.1: {}
+  ordered-binary@1.6.1: {}
 
   os-tmpdir@1.0.2: {}
 

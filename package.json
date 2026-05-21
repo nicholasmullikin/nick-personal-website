@@ -129,7 +129,8 @@
   "pnpm": {
     "overrides": {
       "@types/react": "^19.2.14",
-      "msgpackr": "^1.11.5"
+      "msgpackr": "^1.11.5",
+      "ordered-binary": "^1.5.3"
     }
   }
 }
