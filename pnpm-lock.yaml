@@ -6,6 +6,7 @@ settings:
 
 overrides:
   "@types/react": ^19.2.14
+  msgpackr: ^1.11.5
 
 importers:
   .:
@@ -10779,10 +10780,10 @@ packages:
       }
     hasBin: true
 
-  msgpackr@1.11.0:
+  msgpackr@1.11.12:
     resolution:
       {
-        integrity: sha512-I8qXuuALqJe5laEBYoFykChhSXLikZmUhccjGsPuSJ/7uPip2TJ7lwdIQwWSAi0jGZDXv4WOP8Qg65QZRuXxXw==,
+        integrity: sha512-RBdJ1Un7yGlXWajrkxcSa93nvQ0w4zBf60c0yYv7YtBelP8H2FA7XsfBbMHtXKXUMUxH7zV3Zuozh+kUQWhHvg==,
       }
 
   multer@2.1.1:
@@ -17994,7 +17995,7 @@ snapshots:
       dotenv: 7.0.0
       dotenv-expand: 5.1.0
       json5: 2.2.3
-      msgpackr: 1.11.0
+      msgpackr: 1.11.12
       nullthrows: 1.1.1
       semver: 5.7.2
 
@@ -23358,7 +23359,7 @@ snapshots:
 
   lmdb@2.5.2:
     dependencies:
-      msgpackr: 1.11.0
+      msgpackr: 1.11.12
       node-addon-api: 4.3.0
       node-gyp-build-optional-packages: 5.0.3
       ordered-binary: 1.5.1
@@ -23373,7 +23374,7 @@ snapshots:
 
   lmdb@2.5.3:
     dependencies:
-      msgpackr: 1.11.0
+      msgpackr: 1.11.12
       node-addon-api: 4.3.0
       node-gyp-build-optional-packages: 5.0.3
       ordered-binary: 1.5.1
@@ -23918,7 +23919,7 @@ snapshots:
       "@msgpackr-extract/msgpackr-extract-win32-x64": 3.0.3
     optional: true
 
-  msgpackr@1.11.0:
+  msgpackr@1.11.12:
     optionalDependencies:
       msgpackr-extract: 3.0.3
 
