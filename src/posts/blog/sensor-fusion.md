@@ -3,8 +3,8 @@ title: "Watching a beaker stir, on a phone, with nothing in the cloud"
 category: "Projects"
 date: "2026-05-21 18:00:00 +00:00"
 desc: "A single HTML file that fuses on-device object detection and audio classification into a structured event stream."
-thumbnail: "./images/transfyr/thumbnail.jpg"
-alt: "transfyr lab perception demo"
+thumbnail: "./images/sensor-fusion/thumbnail.jpg"
+alt: "lab perception demo"
 ---
 
 I had a question I couldn't shake: how much "lab perception" can you do _on a phone_, with no backend at all?
@@ -13,7 +13,7 @@ The pretext was a chemistry demo — watching someone stir a glass beaker with a
 
 The whole thing is a single `index.html`. Frames and audio never leave the device.
 
-![transfyr UI showing camera feed with detected vessels, audio spectrum, and a structured event log — TODO replace with screenshot](./images/transfyr/thumbnail.jpg)
+![UI showing camera feed with detected vessels, audio spectrum, and a structured event log — TODO replace with screenshot](./images/sensor-fusion/thumbnail.jpg)
 
 ## The pitch
 
