@@ -51,19 +51,39 @@
           )
           return
         }
+        function rewrite(value) {
+          return typeof value === "string" && value.indexOf(PLACEHOLDER) !== -1
+            ? value.split(PLACEHOLDER).join(token)
+            : value
+        }
         var origFetch = window.fetch.bind(window)
         window.fetch = function (input, init) {
-          if (typeof input === "string" && input.indexOf(PLACEHOLDER) !== -1) {
-            input = input.split(PLACEHOLDER).join(token)
-          } else if (
-            input &&
-            typeof input === "object" &&
-            input.url &&
-            input.url.indexOf(PLACEHOLDER) !== -1
-          ) {
-            input = new Request(input.url.split(PLACEHOLDER).join(token), input)
+          if (typeof input === "string") {
+            input = rewrite(input)
+          } else if (input && typeof input === "object" && input.url) {
+            var newUrl = rewrite(input.url)
+            if (newUrl !== input.url) input = new Request(newUrl, input)
           }
           return origFetch(input, init)
+        }
+        var imgProto = HTMLImageElement.prototype
+        var srcDesc = Object.getOwnPropertyDescriptor(imgProto, "src")
+        if (srcDesc && srcDesc.set) {
+          Object.defineProperty(imgProto, "src", {
+            configurable: true,
+            enumerable: srcDesc.enumerable,
+            get: srcDesc.get,
+            set: function (value) {
+              srcDesc.set.call(this, rewrite(value))
+            },
+          })
+        }
+        if (typeof XMLHttpRequest !== "undefined") {
+          var origOpen = XMLHttpRequest.prototype.open
+          XMLHttpRequest.prototype.open = function (method, url) {
+            arguments[1] = rewrite(url)
+            return origOpen.apply(this, arguments)
+          }
         }
       })()
     </script>
