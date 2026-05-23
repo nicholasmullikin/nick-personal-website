@@ -24,12 +24,11 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
 
   return (
     <Grid role="list">
-      {currentList.map(data => {
+      {currentList.map((data, index) => {
         const { id, slug, title, desc, date, category, thumbnail, alt } = data
-        const ariaLabel = `${title} - ${category} - Posted on ${date}`
         return (
           <List key={id} role="listitem">
-            <Link to={slug ?? ""} aria-label={ariaLabel}>
+            <Link to={slug ?? ""}>
               <Card
                 thumbnail={thumbnail}
                 alt={alt}
@@ -37,6 +36,7 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
                 title={title}
                 desc={desc}
                 date={date}
+                eager={index < 2}
               />
             </Link>
           </List>

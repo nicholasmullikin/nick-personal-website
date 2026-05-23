@@ -11,7 +11,9 @@ import CenteredImg from "./centeredImg"
 type CardProperties = Pick<
   Post,
   "thumbnail" | "alt" | "category" | "title" | "desc" | "date"
->
+> & {
+  eager?: boolean
+}
 
 const Card: React.FC<CardProperties> = ({
   thumbnail,
@@ -20,10 +22,15 @@ const Card: React.FC<CardProperties> = ({
   title,
   desc,
   date,
+  eager = false,
 }) => {
   return (
     <Wrapper>
-      <CenteredImg src={thumbnail} alt={alt} />
+      <CenteredImg
+        src={thumbnail}
+        alt={alt}
+        loading={eager ? "eager" : "lazy"}
+      />
       <Text>
         <div>
           <Category>{category}</Category>

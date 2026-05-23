@@ -34,14 +34,16 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   a {
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    text-decoration-thickness: from-font;
     color: var(--color-blue) !important;
     * {
       color: var(--color-blue) !important;
     }
     &:hover,
     &:active {
-      text-decoration: underline;
+      text-decoration-thickness: 0.1em;
     }
   }
 

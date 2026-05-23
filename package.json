@@ -28,6 +28,11 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix"
   },
+  "browserslist": [
+    "supports es6-module and last 4 years",
+    "Firefox ESR",
+    "not dead"
+  ],
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",
     "@gatsbyjs/reach-router": "^2.0.1",

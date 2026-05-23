@@ -8,11 +8,16 @@ import type Post from "~/src/types/Post"
 
 interface CenteredImgProperties extends Pick<Post, "alt"> {
   src: Post["thumbnail"]
+  loading?: "eager" | "lazy"
 }
 
 const DEFAULT_ALT = "Thumbnail Image"
 
-const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
+const CenteredImg: React.FC<CenteredImgProperties> = ({
+  src,
+  alt,
+  loading = "eager",
+}) => {
   const data = useStaticQuery<Queries.Query>(graphql`
     query CenteredImg {
       allImageSharp {
@@ -22,6 +27,7 @@ const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
             gatsbyImageData(
               layout: CONSTRAINED
               aspectRatio: 1.77
+              width: 480
               placeholder: BLURRED
             )
           }
@@ -40,7 +46,12 @@ const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
   return (
     <ThumbnailWrapper>
       <InnerWrapper>
-        <GatsbyImage image={image} loading="eager" alt={alt ?? DEFAULT_ALT} />
+        <GatsbyImage
+          image={image}
+          loading={loading}
+          alt={alt ?? DEFAULT_ALT}
+          sizes="(min-width: 768px) 480px, 100vw"
+        />
       </InnerWrapper>
     </ThumbnailWrapper>
   )
