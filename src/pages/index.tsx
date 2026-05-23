@@ -27,9 +27,9 @@ const Home = ({
 
     for (const { node } of filteredPostData) {
       const { id, fields, frontmatter } = node
-      const { slug } = fields!
-      const { title, desc, date, category, thumbnail, alt } = frontmatter!
-      const { childImageSharp } = thumbnail!
+      const slug = fields?.slug
+      const { title, desc, date, category, thumbnail, alt } = frontmatter ?? {}
+      const childImageSharp = thumbnail?.childImageSharp
 
       setPosts(previousPost => [
         ...previousPost,
@@ -133,4 +133,23 @@ export const query = graphql`
 
 export default Home
 
-export const Head: HeadFC = () => <SEO title="Home" />
+interface IndexPageContext {
+  category?: string
+}
+
+export const Head: HeadFC<Queries.Query, IndexPageContext> = ({
+  location,
+  pageContext,
+}) => {
+  const category = pageContext.category
+  if (category) {
+    return (
+      <SEO
+        title={category}
+        desc={`Posts in the ${category} category.`}
+        pathname={location.pathname}
+      />
+    )
+  }
+  return <SEO pathname={location.pathname} />
+}

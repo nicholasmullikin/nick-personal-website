@@ -1,4 +1,4 @@
 {
   "**/*.(js|ts)?(x)": "pnpm lint:fix",
-  "**/*": "pnpm format"
+  "**/*": "prettier --write --ignore-unknown"
 }
