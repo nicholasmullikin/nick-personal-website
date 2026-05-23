@@ -27,8 +27,9 @@ const Home = ({
 
     for (const { node } of filteredPostData) {
       const { id, fields, frontmatter } = node
-      const slug = fields?.slug
-      const { title, desc, date, category, thumbnail, alt } = frontmatter ?? {}
+      if (!fields || !frontmatter) continue
+      const { slug } = fields
+      const { title, desc, date, category, thumbnail, alt } = frontmatter
       const childImageSharp = thumbnail?.childImageSharp
 
       setPosts(previousPost => [

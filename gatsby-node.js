@@ -2,6 +2,27 @@ const path = require(`path`)
 const _ = require("lodash")
 const { createFilePath } = require(`gatsby-source-filesystem`)
 
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions
+  // Declare optional frontmatter fields so they're queryable even before any
+  // post uses them. dateModified is consumed by the SEO component / JSON-LD;
+  // tags is consumed by article:tag meta and structured-data keywords.
+  createTypes(`
+    type MarkdownRemark implements Node {
+      frontmatter: MarkdownRemarkFrontmatter
+    }
+    type MarkdownRemarkFrontmatter {
+      title: String
+      desc: String
+      date: Date @dateformat
+      dateModified: Date @dateformat
+      category: String
+      tags: [String]
+      alt: String
+    }
+  `)
+}
+
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions
   if (node.internal.type === `MarkdownRemark`) {

@@ -150,4 +150,6 @@ const Canvas = styled.canvas`
 
 export default NotFound
 
-export const Head: HeadFC = () => <SEO title="Not found" />
+export const Head: HeadFC = ({ location }) => (
+  <SEO title="Not found" pathname={location.pathname} noindex />
+)

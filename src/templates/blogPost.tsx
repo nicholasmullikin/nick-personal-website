@@ -157,7 +157,10 @@ export const query = graphql`
           }
         }
         date(formatString: "YYYY-MM-DD")
+        dateIso: date(formatString: "YYYY-MM-DDTHH:mm:ssZ")
+        dateModifiedIso: dateModified(formatString: "YYYY-MM-DDTHH:mm:ssZ")
         category
+        tags
       }
     }
   }
@@ -165,10 +168,28 @@ export const query = graphql`
 
 export default BlogPost
 
-export const Head: HeadFC<Queries.Query> = ({ data }) => {
-  const { frontmatter } = data.markdownRemark!
-  const { title, desc, thumbnail } = frontmatter!
+export const Head: HeadFC<Queries.BlogPostPageQuery> = ({ data, location }) => {
+  const frontmatter = data.markdownRemark?.frontmatter
+  if (!frontmatter) return null
+  const { title, desc, thumbnail, dateIso, dateModifiedIso, category, tags } =
+    frontmatter
   const ogImagePath =
     thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback?.src
-  return <SEO title={title} desc={desc} image={ogImagePath} />
+  const cleanTags: string[] = (tags ?? []).filter(
+    (t): t is string => typeof t === "string" && t.length > 0,
+  )
+  return (
+    <SEO
+      title={title}
+      desc={desc}
+      image={ogImagePath}
+      pathname={location.pathname}
+      article={{
+        publishedTime: dateIso ?? null,
+        modifiedTime: dateModifiedIso ?? dateIso ?? null,
+        section: category ?? null,
+        tags: cleanTags,
+      }}
+    />
+  )
 }

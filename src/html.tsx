@@ -28,6 +28,16 @@ export default function HTML(props: HTMLProperties) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: light)"
+          content="#ffffff"
+        />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          content="#1c1c1c"
+        />
         {withKeys(props.headComponents, "head")}
       </head>
       <body {...props.bodyAttributes}>

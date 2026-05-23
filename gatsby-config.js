@@ -7,6 +7,7 @@ const siteMetadata = {
   author: meta.author,
   siteUrl: meta.siteUrl,
   lang: meta.lang,
+  locale: meta.locale,
   utterances: {
     repo: meta.utterances,
   },
@@ -101,8 +102,85 @@ const markdownPlugins = [
 ]
 
 const searchPlugins = [
-  "gatsby-plugin-sitemap",
-  "gatsby-plugin-robots-txt",
+  {
+    resolve: "gatsby-plugin-sitemap",
+    options: {
+      query: `
+        {
+          site {
+            siteMetadata {
+              siteUrl
+            }
+          }
+          allSitePage {
+            nodes {
+              path
+            }
+          }
+          allMarkdownRemark(
+            filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
+          ) {
+            nodes {
+              fields {
+                slug
+              }
+              frontmatter {
+                date
+              }
+            }
+          }
+        }
+      `,
+      resolveSiteUrl: ({ site }) => site.siteMetadata.siteUrl,
+      resolvePages: ({
+        allSitePage: { nodes: pages },
+        allMarkdownRemark: { nodes: posts },
+      }) => {
+        const postDates = new Map(
+          posts.map(p => [p.fields.slug, p.frontmatter.date]),
+        )
+        return pages.map(page => {
+          const lastmod = postDates.get(page.path)
+          return {
+            path: page.path,
+            lastmod: lastmod || undefined,
+          }
+        })
+      },
+      serialize: ({ path, lastmod }) => {
+        // Tiered priority: homepage > posts > category pages > everything else.
+        let priority = 0.5
+        let changefreq = "monthly"
+        if (path === "/") {
+          priority = 1
+          changefreq = "weekly"
+        } else if (path.startsWith("/blog/")) {
+          priority = 0.8
+          changefreq = "monthly"
+        } else if (path.startsWith("/category/")) {
+          priority = 0.5
+          changefreq = "weekly"
+        } else if (path === "/about/") {
+          priority = 0.6
+          changefreq = "yearly"
+        }
+        return {
+          url: path,
+          changefreq,
+          priority,
+          ...(lastmod ? { lastmod } : {}),
+        }
+      },
+    },
+  },
+  {
+    resolve: "gatsby-plugin-robots-txt",
+    options: {
+      host: meta.siteUrl,
+      sitemap: `${meta.siteUrl}/sitemap-index.xml`,
+      policy: [{ userAgent: "*", allow: "/" }],
+    },
+  },
   {
     resolve: `gatsby-plugin-feed`,
     options: {

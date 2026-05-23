@@ -68,4 +68,10 @@ const Container = styled(Markdown).attrs({
 
 export default About
 
-export const Head: HeadFC = () => <SEO title="About" />
+export const Head: HeadFC = ({ location }) => (
+  <SEO
+    title="About"
+    desc="About Nick Mullikin — engineer, builder, and writer behind nicholasmullikin.com."
+    pathname={location.pathname}
+  />
+)
