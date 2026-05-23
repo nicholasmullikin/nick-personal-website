@@ -55451,7 +55451,7 @@ lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blu
             pass,
           ) {
             var _a
-            // Unvisited text elements are never placed.
+              // Unvisited text elements are never placed.
             ;(0, harp_utils_1.assert)(groupState.visited)
             const shieldGroups = []
             const hiddenKinds = this.m_viewState.hiddenGeometryKinds
@@ -72421,7 +72421,8 @@ contours:  ${contoursEnabled ? "ON" : "OFF"}  [C]`
   /******/
   /************************************************************************/
   /******/ /* webpack/runtime/chunk loaded */
-  /******/ ;(() => {
+  /******/
+  ;(() => {
     /******/ var deferred = []
     /******/ __webpack_require__.O = (result, chunkIds, fn, priority) => {
       /******/ if (chunkIds) {
@@ -72471,7 +72472,8 @@ contours:  ${contoursEnabled ? "ON" : "OFF"}  [C]`
   })()
   /******/
   /******/ /* webpack/runtime/compat get default export */
-  /******/ ;(() => {
+  /******/
+  ;(() => {
     /******/ // getDefaultExport function for compatibility with non-harmony modules
     /******/ __webpack_require__.n = module => {
       /******/ var getter =
@@ -72486,7 +72488,8 @@ contours:  ${contoursEnabled ? "ON" : "OFF"}  [C]`
   })()
   /******/
   /******/ /* webpack/runtime/define property getters */
-  /******/ ;(() => {
+  /******/
+  ;(() => {
     /******/ // define getter functions for harmony exports
     /******/ __webpack_require__.d = (exports, definition) => {
       /******/ for (var key in definition) {
@@ -72508,14 +72511,16 @@ contours:  ${contoursEnabled ? "ON" : "OFF"}  [C]`
   })()
   /******/
   /******/ /* webpack/runtime/hasOwnProperty shorthand */
-  /******/ ;(() => {
+  /******/
+  ;(() => {
     /******/ __webpack_require__.o = (obj, prop) =>
       Object.prototype.hasOwnProperty.call(obj, prop)
     /******/
   })()
   /******/
   /******/ /* webpack/runtime/make namespace object */
-  /******/ ;(() => {
+  /******/
+  ;(() => {
     /******/ // define __esModule on exports
     /******/ __webpack_require__.r = exports => {
       /******/ if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
@@ -72531,7 +72536,8 @@ contours:  ${contoursEnabled ? "ON" : "OFF"}  [C]`
   })()
   /******/
   /******/ /* webpack/runtime/jsonp chunk loading */
-  /******/ ;(() => {
+  /******/
+  ;(() => {
     /******/ // no baseURI
     /******/
     /******/ // object to store loaded and loading chunks

@@ -3,7 +3,7 @@ title: "Maps Demo"
 category: "Maps"
 date: "2026-05-19 18:00:00 +00:00"
 desc: "A tour of five different map techniques in one post."
-thumbnail: "./images/getting-started/thumbnail.jpg"
+thumbnail: "./images/maps/thumbnail.jpg"
 alt: "maps demo"
 ---
 
