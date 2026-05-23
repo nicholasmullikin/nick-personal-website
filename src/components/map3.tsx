@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 
 import { Environment, OrbitControls } from "@react-three/drei"
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber"
@@ -10,7 +10,11 @@ import {
   TextureLoader,
 } from "three"
 
-function Earth() {
+interface EarthProperties {
+  guiHost: HTMLDivElement | null
+}
+
+function Earth({ guiHost }: EarthProperties) {
   const meshRef = useRef<Mesh>(null)
   const materialRef = useRef<MeshStandardMaterial>(null)
   const { gl } = useThree()
@@ -22,12 +26,12 @@ function Earth() {
   )
 
   useEffect(() => {
-    if (!materialRef.current) return
-    const gui = new GUI({ container: undefined, title: "Map3" })
+    if (!materialRef.current || !guiHost) return
+    const gui = new GUI({ container: guiHost, title: "Map3" })
     gui.add(materialRef.current, "wireframe")
     gui.add(materialRef.current, "displacementScale", 0, 1, 0.01)
     return () => gui.destroy()
-  }, [])
+  }, [guiHost])
 
   useEffect(() => {
     texture.colorSpace = SRGBColorSpace
@@ -56,10 +60,12 @@ function Earth() {
 }
 
 export function Map3() {
+  const [guiHost, setGuiHost] = useState<HTMLDivElement | null>(null)
+
   if (typeof window === "undefined") return null
 
   return (
-    <div style={{ width: "100%", height: "400px" }}>
+    <div style={{ position: "relative", width: "100%", height: "400px" }}>
       <Canvas shadows="percentage" camera={{ position: [0, 0, 2.2], fov: 50 }}>
         <Suspense fallback={null}>
           <Environment files="/img/venice_sunset_1k.hdr" />
@@ -71,10 +77,19 @@ export function Map3() {
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
           />
-          <Earth />
+          <Earth guiHost={guiHost} />
           <OrbitControls />
         </Suspense>
       </Canvas>
+      <div
+        ref={setGuiHost}
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          zIndex: 1,
+        }}
+      />
     </div>
   )
 }

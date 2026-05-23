@@ -21,7 +21,6 @@ export default tseslint.config(
       "**/.cache/**",
       "**/coverage/**",
       "pnpm-lock.yaml",
-      "src/components/map2.tsx",
       "src/components/map3.tsx",
       "src/components/map4.tsx",
       "static/harp/**",
