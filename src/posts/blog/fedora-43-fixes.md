@@ -1,8 +1,8 @@
 ---
-title: "A grab bag of Fedora 43 desktop fixes"
+title: "Fedora 43/44 desktop fixes"
 category: "Linux"
 date: "2026-05-18 18:00:00 +00:00"
-desc: "Eight things that broke on my Fedora 43 desktop in the last few weeks, and the one-liner that fixed each one."
+desc: Things that broke on my Fedora  desktop in 2026, and the one-liner that fixed each one."
 thumbnail: "./images/fedora-43-fixes/thumbnail.jpg"
 alt: "Fedora 43 desktop fixes"
 ---
