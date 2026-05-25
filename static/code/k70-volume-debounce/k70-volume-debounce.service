@@ -1,0 +1,14 @@
+[Unit]
+Description=Volume wheel debounce for Corsair K70 TKL
+After=systemd-udevd.service
+Wants=systemd-udevd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/k70-volume-debounce --debounce-ms 50
+Restart=always
+RestartSec=3
+Nice=-5
+
+[Install]
+WantedBy=multi-user.target

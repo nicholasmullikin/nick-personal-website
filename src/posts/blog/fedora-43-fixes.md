@@ -7,13 +7,11 @@ thumbnail: "./images/fedora-43-fixes/thumbnail.jpg"
 alt: "Fedora 43 desktop fixes"
 ---
 
-Linux desktop is mostly fine.
+I started daily driving Fedora at home recently and it usually works.
 
-Until it isn't, and you spend an entire Saturday working out why your headset has no microphone, why your audio crackles when you plug in a USB device, why GDM keeps prompting you for a wallet password it should know, why your Wi-Fi card needs a power cycle after a long suspend, and why the SteamVR dashboard renders as a flat 2D pane in a void.
+Here is the running list of things that did not / stopped working. Each one has a TL;DR fix at the top, then the why, in case you hit the same thing six months from now.
 
-Here are the eight Fedora 43 things that broke on me in the last few weeks. Each one has a TL;DR fix at the top, then the why, in case you hit the same thing six months from now.
-
-![Fedora 43 desktop with Plasma audio applet, Helvum patchbay, and a journal full of `ath12k_pci` errors — TODO replace with screenshot](./images/fedora-43-fixes/thumbnail.jpg)
+![Fedora 43 desktop](./images/fedora-43-fixes/image.jpg)
 
 ## 1. Arctis Pro Wireless mic missing
 
@@ -55,9 +53,11 @@ The before/after numbers from my own keyboard:
 | Fast DOWN | 100%        | 100%         |
 | Fast UP   | 92%         | **95%**      |
 
-Installation, once `python3-evdev` is on the box, is a `systemd` unit that runs the script as root (it needs `/dev/input/eventX` access). The script is in [`~/src/docs/k70-volume-debounce.py`](https://github.com/nicholasmullikin/dotfiles).
+Installation, once `python3-evdev` is on the box, is a `systemd` unit that runs the script as root (it needs `/dev/input/eventX` access). The script and unit file are in this site's repo: [`k70-volume-debounce.py`](https://github.com/nicholasmullikin/nick-website/blob/main/static/code/k70-volume-debounce/k70-volume-debounce.py) and [`k70-volume-debounce.service`](https://github.com/nicholasmullikin/nick-website/blob/main/static/code/k70-volume-debounce/k70-volume-debounce.service) (see the [folder README](https://github.com/nicholasmullikin/nick-website/blob/main/static/code/k70-volume-debounce/) for install steps and tuning flags).
 
-## 3. Woojer Vest Edge USB destroys the entire audio graph
+## 3. Woojer Vest Edge USB destroys the entire audio graph in Wireplumber
+
+![helvum screenshot](./images/fedora-43-fixes/helvum.png)
 
 **TL;DR:** Pin the Woojer's `priority.driver` to 0 in WirePlumber.
 
@@ -112,7 +112,13 @@ sudo dracut --force
 
 ...plus, the first time, a MOK key import.
 
-Fedora kernel updates rebuild NVIDIA's out-of-tree modules through `akmods`, which signs them with a key in `/etc/pki/akmods/certs/`. Secure Boot rejects unsigned kernel modules, so that key has to be enrolled in the firmware's MOK list, which you do once with `mokutil --import` and a reboot into the MOK Manager.
+The symptom is a journal full of `nvidia kernel module not found, using nouveau` after a kernel update — the modules built fine, they just aren't loading. Fedora kernel updates rebuild NVIDIA's out-of-tree modules through `akmods`, which signs them with the key at `/etc/pki/akmods/certs/public_key.der`. Secure Boot rejects unsigned kernel modules, so that key has to be enrolled in the firmware's MOK list, which you do once:
+
+```bash
+sudo mokutil --import /etc/pki/akmods/certs/public_key.der
+# set a password, reboot, enroll in the MOK Manager screen
+mokutil --list-enrolled | grep -i akmod   # verify after reboot
+```
 
 What gets you _every_ kernel update, though, is that LUKS-encrypted root filesystems need NVIDIA drivers in the initramfs (otherwise you get a black screen post-decryption while the kernel sits at "no driver loaded"). So `dracut --force` after every `akmods --force`. To avoid forgetting:
 
@@ -121,11 +127,11 @@ What gets you _every_ kernel update, though, is that LUKS-encrypted root filesys
 add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
 ```
 
-And a kernel-install hook at `/etc/kernel/install.d/99-nvidia-akmods.install` that runs both commands automatically when a new kernel lands. The hook is what you actually want long-term — manually rebuilding modules once per kernel is the kind of thing that fails three months later, on a Saturday, in a hurry.
+And a kernel-install hook at `/etc/kernel/install.d/99-nvidia-akmods.install` that runs both commands automatically when a new kernel lands (logs to the journal under `nvidia-akmods` and `nvidia-dracut`). The hook is what you actually want long-term — manually rebuilding modules once per kernel is the kind of thing that fails three months later, on a Saturday, in a hurry.
 
 ## 6. SteamVR's flat 2D dashboard with the Bigscreen Beyond
 
-**TL;DR:**
+**TL;DR:** This didn't fully work, but this at least stopped tit from fully not working.
 
 ```bash
 chmod -x ~/.steam/steam/steamapps/common/SteamVR/bin/vrwebhelper/linux64/vrwebhelper
@@ -164,19 +170,3 @@ Switching to `s2idle` (suspend-to-idle) avoids the buggy MHI resume path entirel
 
 - The S3 failure was n=1 in my own data — three of four prior S3 cycles resumed cleanly. Don't read too much into the apparent severity.
 - WoWLAN-based remote wake doesn't work with s2idle on this board. If you need remote wake, use the wired NIC.
-
-## 8. Quick takeaway block
-
-If you came here with a specific symptom, here's the one-liner you probably need:
-
-| Symptom                                            | Fix                                                               |
-| -------------------------------------------------- | ----------------------------------------------------------------- |
-| Headset mic missing, only "Monitor of …" available | `pactl set-card-profile … output:stereo-game+input:mono-chat`     |
-| K70 volume wheel scrolls both directions at once   | 50 ms evdev debounce filter as a systemd service                  |
-| All audio crackles when Woojer USB is in the graph | `priority.driver = 0` for `~alsa_output.*Woojer.*` in WirePlumber |
-| KDE Wallet prompts every login on GDM              | Add `pam_kwallet5.so` lines to `/etc/pam.d/gdm-password`          |
-| NVIDIA module not loading after kernel update      | `akmods --force && dracut --force`, MOK enrolled                  |
-| SteamVR dashboard renders flat                     | `chmod -x vrwebhelper` and install WayVR                          |
-| ath12k Wi-Fi wedged after long suspend             | `mem_sleep_default=s2idle`                                        |
-
-I do this — keep notes, write things up, build little debounce scripts and WirePlumber drop-ins — because I want my computer to do what I want. Sometimes that's a 30-second `pactl` invocation. Sometimes it's three weekends and an evdev filter. The compounding return is that the next time something breaks, I have a written answer two minutes away instead of a Saturday's worth of grep.
