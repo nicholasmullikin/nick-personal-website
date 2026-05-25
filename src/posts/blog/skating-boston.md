@@ -3,7 +3,7 @@ title: "Boston Skating"
 category: "Projects"
 date: "2026-05-22 18:00:00 +00:00"
 desc: "Why a weekend project turned into skating.boston."
-thumbnail: "./images/skating-boston/thumbnail.jpg"
+thumbnail: "./images/skating-boston/thumbnail.png"
 alt: "skating.boston rink map"
 ---
 

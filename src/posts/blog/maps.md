@@ -3,7 +3,7 @@ title: "Maps Demo"
 category: "Maps"
 date: "2026-05-19 18:00:00 +00:00"
 desc: "A tour of different 3d frontend map libraries."
-thumbnail: "./images/maps/thumbnail.jpg"
+thumbnail: "./images/maps/thumbnail.png"
 alt: "maps demo"
 ---
 

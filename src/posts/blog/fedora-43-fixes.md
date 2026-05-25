@@ -3,7 +3,7 @@ title: "Fedora 43/44 desktop fixes"
 category: "Linux"
 date: "2026-05-18 18:00:00 +00:00"
 desc: Things that broke on my Fedora  desktop in 2026, and the one-liner that fixed each one."
-thumbnail: "./images/fedora-43-fixes/thumbnail.jpg"
+thumbnail: "./images/fedora-43-fixes/thumbnail.png"
 alt: "Fedora 43 desktop fixes"
 ---
 

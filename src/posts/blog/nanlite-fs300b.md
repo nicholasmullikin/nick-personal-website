@@ -1,5 +1,5 @@
 ---
-title: "All I wanted was to dim my key light from a script"
+title: "Automating the Nanlite FS-300B"
 category: "Reverse engineering"
 date: "2026-05-20 18:00:00 +00:00"
 desc: "Reverse-engineering the Nanlite FS-300B's Bluetooth Mesh + Feasycom TEA stack so I could control it from Linux without the NANLINK app."
@@ -9,9 +9,7 @@ alt: "Nanlite FS-300B reverse engineering"
 
 I have a Nanlite FS-300B LED light on my desk. It's lovely, except that the only sanctioned way to control it is the NANLINK app on a phone. I wanted to control it from a script on my laptop.
 
-How hard could it be? It's just Bluetooth.
-
-It is _just_ Bluetooth, in roughly the same way that a 1972 wiring harness is _just_ copper. There are layers.
+How hard could it be?
 
 ![Nanlite FS-300B LED light — TODO replace with photo](./images/nanlite-fs300b/thumbnail.jpg)
 
