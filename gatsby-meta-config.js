@@ -27,7 +27,7 @@ const metaConfig = {
   locale: "en_US",
   utterances: "nicholasmullikin/website-comments",
   links: {
-    github: "https://github.com/nicholasmullikin/gatsby-starter-apple",
+    github: "https://github.com/nicholasmullikin/nick-website",
   },
   favicon: "src/images/icon.png",
 }

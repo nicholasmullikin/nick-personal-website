@@ -1,6 +1,6 @@
-# Contributing to gatsby-starter-apple
+# Contributing to nick-website
 
-Welcome to gatsby-starter-apple. We want to make contributing to this project as easy and transparent as possible, whether it's:
+Welcome to nick-website. We want to make contributing to this project as easy and transparent as possible, whether it's:
 
 - Reporting a bug
 - Discussing the current state of the code
