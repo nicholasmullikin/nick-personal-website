@@ -12,6 +12,9 @@ import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
 const MapsBlockLazy = React.lazy(() => import("~/src/components/mapsBlock"))
+const GaussianSplatBlockLazy = React.lazy(
+  () => import("~/src/components/gaussianSplatBlock"),
+)
 
 const MapsBlock: FC<{ slug: string }> = ({ slug }) => {
   if (slug !== "/blog/maps/") return null
@@ -20,6 +23,17 @@ const MapsBlock: FC<{ slug: string }> = ({ slug }) => {
   return (
     <Suspense fallback={null}>
       <MapsBlockLazy />
+    </Suspense>
+  )
+}
+
+const GaussianSplatBlock: FC<{ slug: string }> = ({ slug }) => {
+  if (slug !== "/blog/gaussian-splats/") return null
+  if (typeof window === "undefined") return null
+
+  return (
+    <Suspense fallback={null}>
+      <GaussianSplatBlockLazy />
     </Suspense>
   )
 }
@@ -51,6 +65,7 @@ const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
                   rhythm={rhythm}
                 />
                 <MapsBlock slug={slug} />
+                <GaussianSplatBlock slug={slug} />
               </div>
             </InnerWrapper>
           </OuterWrapper>

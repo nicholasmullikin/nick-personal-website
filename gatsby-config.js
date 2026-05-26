@@ -105,6 +105,7 @@ const searchPlugins = [
   {
     resolve: "gatsby-plugin-sitemap",
     options: {
+      excludes: ["/thumbgen/", "/thumbgen"],
       query: `
         {
           site {
