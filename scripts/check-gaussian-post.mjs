@@ -58,12 +58,42 @@ try {
   // for the visible markdown to render instead.
   await page.locator("h2", { hasText: "Step 1" }).waitFor({ timeout: 30_000 })
 
+  // The post is long; production has loading="lazy" on inline images. Scroll
+  // top to bottom so every <img> enters the viewport and starts loading.
+  await page.evaluate(async () => {
+    const step = 600
+    for (let y = 0; y < document.body.scrollHeight + step; y += step) {
+      window.scrollTo(0, y)
+      await new Promise(r => setTimeout(r, 100))
+    }
+    window.scrollTo(0, 0)
+  })
+
   // Step 1 — clip.webp
-  const clipUrl = [...responses.keys()].find(u => u.endsWith("/clip.webp"))
+  await page
+    .locator("img[src*='clip.webp']")
+    .first()
+    .scrollIntoViewIfNeeded({ timeout: 5_000 })
   const clipImg = await page
     .locator("img[src*='clip.webp']")
     .first()
     .elementHandle()
+  if (clipImg) {
+    await clipImg
+      .evaluate(
+        img =>
+          new Promise(resolve => {
+            if (img.complete && img.naturalWidth) resolve()
+            else {
+              img.addEventListener("load", () => resolve(), { once: true })
+              img.addEventListener("error", () => resolve(), { once: true })
+              setTimeout(resolve, 8000)
+            }
+          }),
+      )
+      .catch(() => {})
+  }
+  const clipUrl = [...responses.keys()].find(u => u.endsWith("/clip.webp"))
   const clipDims = clipImg
     ? await clipImg.evaluate(img => ({
         natural: img.naturalWidth,
@@ -85,6 +115,19 @@ try {
   const frameCount = await page
     .locator("img[src*='/blog/gaussian/frames/']")
     .count()
+  // Give lazy-loaded thumbnails a chance to finish after the scroll above.
+  await page
+    .waitForFunction(
+      () => {
+        const imgs = [
+          ...document.querySelectorAll("img[src*='/blog/gaussian/frames/']"),
+        ]
+        return imgs.length > 0 && imgs.every(i => i.complete && i.naturalWidth)
+      },
+      null,
+      { timeout: 15_000 },
+    )
+    .catch(() => {})
   const okFrames = [...responses.keys()].filter(
     u => u.includes("/blog/gaussian/frames/") && responses.get(u) === 200,
   ).length
