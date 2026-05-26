@@ -9,6 +9,32 @@ import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader.js"
 const POINT_CLOUD_URL = "/blog/gaussian/points.ply"
 const SPLAT_URL = "/blog/gaussian/scene.splat"
 
+// One viewer crashing (e.g. drei's Splat throwing because a CDN stripped
+// Content-Length during brotli encoding) shouldn't take down the other.
+class ViewerBoundary extends React.Component<
+  { children: React.ReactNode; label: string },
+  { error: Error | null }
+> {
+  state = { error: null as Error | null }
+  static getDerivedStateFromError(error: Error) {
+    return { error }
+  }
+  componentDidCatch(error: Error) {
+    console.error("GaussianSplatBlock viewer failed:", error)
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <ErrorSlot>
+          {this.props.label} failed to load:{" "}
+          <code>{String(this.state.error.message || this.state.error)}</code>
+        </ErrorSlot>
+      )
+    }
+    return this.props.children
+  }
+}
+
 const PointCloud = () => {
   const geometry = useLoader(PLYLoader, POINT_CLOUD_URL) as THREE.BufferGeometry
   const camera = useThree(state => state.camera)
@@ -53,16 +79,18 @@ const GaussianSplatBlock = () => {
           The ~67k 3D points triangulated from feature matches across the
           frames, colored from their image observations. Drag to orbit.
         </Description>
-        <Canvas
-          camera={{ position: [3, 1.5, 3], fov: 45, near: 0.01, far: 1000 }}
-          style={{ height: 400, background: "#0a0a0a", borderRadius: 8 }}
-          gl={{ antialias: true }}
-        >
-          <Suspense fallback={null}>
-            <PointCloud />
-          </Suspense>
-          <OrbitControls makeDefault enableDamping />
-        </Canvas>
+        <ViewerBoundary label="Point cloud">
+          <Canvas
+            camera={{ position: [3, 1.5, 3], fov: 45, near: 0.01, far: 1000 }}
+            style={{ height: 400, background: "#0a0a0a", borderRadius: 8 }}
+            gl={{ antialias: true }}
+          >
+            <Suspense fallback={null}>
+              <PointCloud />
+            </Suspense>
+            <OrbitControls makeDefault enableDamping />
+          </Canvas>
+        </ViewerBoundary>
       </Slot>
       <Slot data-testid="gs-splat">
         <h3>Trained 3D Gaussian Splat</h3>
@@ -71,16 +99,18 @@ const GaussianSplatBlock = () => {
           kept by sorting on <code>opacity × volume</code> so the high-impact
           blobs survive. Drag to orbit; expect a couple seconds of load.
         </Description>
-        <Canvas
-          camera={{ position: [3, 1.5, 3], fov: 45, near: 0.01, far: 1000 }}
-          style={{ height: 480, background: "#0a0a0a", borderRadius: 8 }}
-          gl={{ antialias: false }}
-        >
-          <Suspense fallback={null}>
-            <Splat src={SPLAT_URL} rotation={[Math.PI, 0, 0]} />
-          </Suspense>
-          <OrbitControls makeDefault enableDamping />
-        </Canvas>
+        <ViewerBoundary label="Splat">
+          <Canvas
+            camera={{ position: [3, 1.5, 3], fov: 45, near: 0.01, far: 1000 }}
+            style={{ height: 480, background: "#0a0a0a", borderRadius: 8 }}
+            gl={{ antialias: false }}
+          >
+            <Suspense fallback={null}>
+              <Splat src={SPLAT_URL} rotation={[Math.PI, 0, 0]} />
+            </Suspense>
+            <OrbitControls makeDefault enableDamping />
+          </Canvas>
+        </ViewerBoundary>
       </Slot>
     </Stack>
   )
@@ -104,6 +134,18 @@ const Slot = styled.div`
 const Description = styled.p`
   margin: 0 0 var(--sizing-xs);
   line-height: 1.5;
+`
+
+const ErrorSlot = styled.div`
+  padding: var(--sizing-md);
+  border: 1px solid var(--color-gray-3);
+  border-radius: 8px;
+  background: var(--color-gray-2);
+  font-size: 0.9rem;
+
+  code {
+    word-break: break-all;
+  }
 `
 
 export default GaussianSplatBlock
