@@ -64,7 +64,7 @@ Some of the things I now know, against my will:
 
 ## What I learned
 
-I can go skate on [skating.boston](https://www.skating.boston/):
+When + where I can go skate:
 
 <iframe
   src="https://www.skating.boston/"
@@ -75,3 +75,4 @@ I can go skate on [skating.boston](https://www.skating.boston/):
   sandbox="allow-scripts allow-same-origin allow-popups"
   allowfullscreen
 ></iframe>
+[skating.boston](https://www.skating.boston/):
