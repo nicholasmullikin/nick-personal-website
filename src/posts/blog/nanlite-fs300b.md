@@ -3,7 +3,7 @@ title: "Automating the Nanlite FS-300B"
 category: "Reverse engineering"
 date: "2026-05-20 18:00:00 +00:00"
 desc: "Reverse-engineering the Nanlite FS-300B's Bluetooth Mesh + Feasycom TEA stack so I could control it from Linux without the NANLINK app."
-thumbnail: "./images/nanlite-fs300b/thumbnail.jpg"
+thumbnail: "./images/nanlite-fs300b/thumbnail.png"
 alt: "Nanlite FS-300B reverse engineering"
 ---
 

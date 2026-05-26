@@ -2,7 +2,7 @@
 title: "Fedora 43/44 desktop fixes"
 category: "Linux"
 date: "2026-05-18 18:00:00 +00:00"
-desc: Things that broke on my Fedora  desktop in 2026, and the one-liner that fixed each one."
+desc: Things that broke on my Fedora desktop in 2026.
 thumbnail: "./images/fedora-43-fixes/thumbnail.png"
 alt: "Fedora 43 desktop fixes"
 ---
@@ -11,7 +11,7 @@ I started daily driving Fedora at home recently and it usually works.
 
 Here is the running list of things that did not / stopped working. Each one has a TL;DR fix at the top, then the why, in case you hit the same thing six months from now.
 
-![Fedora 43 desktop](./images/fedora-43-fixes/image.jpg)
+![Fedora 43 desktop](./images/fedora-43-fixes/helvum.png)
 
 ## 1. Arctis Pro Wireless mic missing
 

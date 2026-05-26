@@ -13,20 +13,20 @@ Turns out it's a bit harder than it looks since every rink has a completely diff
 
 So I built [skating.boston](https://skating.boston).
 
-![skating.boston map of public skating in greater Boston](./images/skating-boston/Screen Shot 2026-05-25 at 16.47.00.png)
+![skating.boston map of public skating in greater Boston](./images/skating-boston/site.png)
 
 ## Why this exists
 
-There are, broadly, two kinds of "the website has the data":
+There are two kinds of "the website has the data":
 
 1. The data is _in the page_ in a structured way you can scrape.
 2. The data is in _a person's brain_ and the website happens to host it too.
 
-Public skating in Massachusetts is split roughly 50/50 between those two categories. So I started writing parsers.
+Public skating in Massachusetts is split roughly 50/50 between those two categories.
 
 ## How many types of data are there
 
-I know have **49 rink-specific parsers** for all the different rinks around. Here are the broad categories
+I now have **49 rink-specific parsers** for all the different rinks around. Here are the broad categories
 
 | Pattern                                       | Example rinks                              | What you actually parse                              |
 | --------------------------------------------- | ------------------------------------------ | ---------------------------------------------------- |
@@ -60,7 +60,7 @@ Some of the things I now know, against my will:
 - **Daly Rink lies about timezones.** Their HTML has `datetime='2025-02-23T15:00:00+00:00'` but renders "3:00 pm" in Eastern. The `+00:00` is decorative. The parser strips the `+00:00`, ignores it, and reconstructs the time in `America/New_York`.
 - **North Adams' calendar is stuck in 2017.** Their Google Calendar is real, but every event has an `RRULE` that expired in 2017. Meanwhile, the rink's website has the actual hours in plain text — "Monday through Friday 3:00 pm – 5:00 pm, Friday Nights 8:00 pm – 10:00 pm, Saturday and Sunday 2:00 pm – 4:00 pm." So the parser ignores the calendar feed entirely and generates a rolling two-month window of events from the published hours.
 - **NorthStar publishes their schedule as an image.** Not even a PDF. A JPG on the homepage. I read it with my eyes, transcribed it into Go, and the parser now generates Saturday/Sunday 1:00–2:30 pm events starting from the season opener.
-- **FMC's `CalendarLabel` is fuzzy.** Strings like "Worcester - Ice Sheet" needed an explicit O(1) location map to all 26 FMC rinks. Generic edit-distance matching gave scores of 7+ and produced hundreds of warning logs per ingest run. Sometimes the dumbest fix (a `map[string]string`) is the right one.
+- **FMC's `CalendarLabel` is fuzzy.** Strings like "Worcester - Ice Sheet" needed an explicit O(1) location map to all 26 FMC rinks. Generic edit-distance matching gave scores of 7+ and produced hundreds of warnings per ingest run. Sometimes the dumbest fix (a `map[string]string`) is the right one.
 
 ## What I learned
 
