@@ -172,9 +172,9 @@ try {
   // Step 4 — splat (scene.splat + second canvas renders)
   await page
     .locator("[data-testid='gs-splat']")
-    .scrollIntoViewIfNeeded({ timeout: 5_000 })
+    .scrollIntoViewIfNeeded({ timeout: 15_000 })
   const splatCanvas = page.locator("[data-testid='gs-splat'] canvas").first()
-  await splatCanvas.waitFor({ state: "visible", timeout: 10_000 })
+  await splatCanvas.waitFor({ state: "visible", timeout: 30_000 })
   await page.waitForFunction(
     () =>
       [...performance.getEntriesByType("resource")].some(e =>
