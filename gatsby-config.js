@@ -267,7 +267,7 @@ exports.replaceHydrateFunction = () => {
 }
 
 module.exports = {
-  graphqlTypegen: true,
+  graphqlTypegen: { generateOnBuild: true },
   jsxRuntime: "automatic",
   siteMetadata,
   flags: {
