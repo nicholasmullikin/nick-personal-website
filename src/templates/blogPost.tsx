@@ -4,6 +4,7 @@ import { type HeadFC, type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
 import Comment from "~/src/components/comment"
+import X11FocusDiagram from "~/src/components/x11FocusDiagram"
 import SEO from "~/src/components/seo"
 import Layout from "~/src/layouts/layout"
 import Category from "~/src/styles/category"
@@ -43,6 +44,11 @@ const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
   const { frontmatter, html, fields } = markdownRemark!
   const { title, desc, date, category } = frontmatter!
   const slug = fields?.slug ?? ""
+  const diagramMarker = "<!-- X11_FOCUS_DIAGRAM -->"
+  const parts =
+    slug === "/blog/x11-focus-bug/"
+      ? (html ?? "").split(diagramMarker)
+      : [html ?? ""]
 
   return (
     <Layout>
@@ -60,10 +66,15 @@ const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
                   <Desc>{desc}</Desc>
                 </header>
                 <Divider />
-                <Markdown
-                  dangerouslySetInnerHTML={{ __html: html ?? "" }}
-                  rhythm={rhythm}
-                />
+                {parts.map((part, index) => (
+                  <React.Fragment key={part}>
+                    {index > 0 && <X11FocusDiagram />}
+                    <Markdown
+                      dangerouslySetInnerHTML={{ __html: part }}
+                      rhythm={rhythm}
+                    />
+                  </React.Fragment>
+                ))}
                 <MapsBlock slug={slug} />
                 <GaussianSplatBlock slug={slug} />
               </div>
