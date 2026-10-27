@@ -91,6 +91,7 @@ try {
   })
   const mobile = await touch.newPage()
   await mobile.goto(`${base}/blog/x11-focus-bug/`)
+  await mobile.waitForLoadState("networkidle")
   const tap = mobile.getByRole("button", {
     name: "Missing argument",
     exact: true,
