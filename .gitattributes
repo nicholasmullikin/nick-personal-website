@@ -1,0 +1,2 @@
+# Renderer artifacts are emitted by the source build; retain original third-party formatting.
+static/harp/** linguist-generated=true -whitespace

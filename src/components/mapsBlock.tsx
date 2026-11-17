@@ -7,6 +7,7 @@ import { Map1 } from "~/src/components/map"
 import { Map3 } from "~/src/components/map3"
 import { Map4 } from "~/src/components/map4"
 import { Map5 } from "~/src/components/map5"
+import { MapGraphics } from "~/src/components/mapGraphics"
 
 const SILENCED_THREE_WARNINGS = ["Clock: This module has been deprecated"]
 
@@ -38,7 +39,9 @@ const MapsBlock = () => {
           sphere. Drag to orbit.
         </Description>
         <Suspense fallback={<MapFallback />}>
-          <Map1 />
+          <MapGraphics requiresWebGL2>
+            <Map1 />
+          </MapGraphics>
         </Suspense>
       </Slot>
       <Slot>
@@ -49,7 +52,9 @@ const MapsBlock = () => {
           surface.
         </Description>
         <Suspense fallback={<MapFallback />}>
-          <Map3 />
+          <MapGraphics requiresWebGL2>
+            <Map3 />
+          </MapGraphics>
         </Suspense>
       </Slot>
       <Slot>
@@ -63,34 +68,26 @@ const MapsBlock = () => {
           extruded to actual building heights.
         </Description>
         <Suspense fallback={<MapFallback />}>
-          <Map4 />
+          <MapGraphics center={[-74.01, 40.707]} zoom={15}>
+            {contextType => <Map4 contextType={contextType} />}
+          </MapGraphics>
         </Suspense>
       </Slot>
       <Slot>
-        <h3>4. harp.gl globe with terrain &amp; atmosphere</h3>
+        <h3>4. Interactive Earth with harp.gl</h3>
         <Description>
-          The <code>rendering_globe-atmosphere</code> example from{" "}
-          <a
-            href="https://github.com/xyzmaps/harp.gl"
-            target="_blank"
-            rel="noreferrer"
-          >
-            xyz-threejs
-          </a>
-          , embedded in an iframe. A spherical-projection{" "}
-          <a
-            href="https://github.com/xyzmaps/harp.gl"
-            target="_blank"
-            rel="noreferrer"
-          >
-            harp.gl
-          </a>{" "}
-          <code>MapView</code> drapes Mapbox satellite tiles over a Mapbox
-          terrain-RGB DEM, with a custom shader for hillshading, contour lines
-          and atmospheric fog.
+          Explore satellite imagery over real-scale terrain, from orbit to
+          mountain valleys and cities. OpenStreetMap buildings appear as you
+          approach a city, while city lights emerge after sunset and animated
+          clouds drift above the surface. Drag to move, scroll to zoom, and
+          choose a city or landscape preset. Use the Sun slider, Day/Night
+          buttons, or play button to explore the lighting. Clouds and night
+          lights use historical NASA composites, not live weather or imagery.
         </Description>
         <Suspense fallback={<MapFallback />}>
-          <Map5 />
+          <MapGraphics height={500}>
+            <Map5 />
+          </MapGraphics>
         </Suspense>
       </Slot>
     </Stack>

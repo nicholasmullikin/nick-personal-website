@@ -1,23 +1,36 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import maplibregl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
+import { type MapGraphicsVersion, RasterMapFallback } from "./mapGraphics"
 
-export function Map4() {
+export function Map4({ contextType }: { contextType?: MapGraphicsVersion }) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [graphicsUnavailable, setGraphicsUnavailable] = useState(false)
 
   useEffect(() => {
     if (!containerRef.current) return
 
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
-      center: [-74.01, 40.707],
-      zoom: 15,
-      pitch: 60,
-      bearing: -20,
-      attributionControl: { compact: true },
-    })
+    const container = containerRef.current
+    let map: maplibregl.Map
+    try {
+      map = new maplibregl.Map({
+        container,
+        style: "https://tiles.openfreemap.org/styles/liberty",
+        center: [-74.01, 40.707],
+        zoom: 15,
+        pitch: 60,
+        bearing: -20,
+        attributionControl: { compact: true },
+        canvasContextAttributes: { contextType, powerPreference: "default" },
+      })
+    } catch {
+      // Context allocation can still fail after the capability check (GPU policy
+      // or exhausted contexts). Keep that failure local to this demonstration.
+      container.replaceChildren()
+      setGraphicsUnavailable(true)
+      return
+    }
 
     const emptyImage: ImageData = new ImageData(1, 1)
     map.on("styleimagemissing", event => {
@@ -73,7 +86,10 @@ export function Map4() {
     })
 
     return () => map.remove()
-  }, [])
+  }, [contextType])
+
+  if (graphicsUnavailable)
+    return <RasterMapFallback center={[-74.01, 40.707]} zoom={15} />
 
   return (
     <div

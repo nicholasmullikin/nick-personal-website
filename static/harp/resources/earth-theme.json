@@ -1,0 +1,9 @@
+{
+  "clearColor": "#000000",
+  "lights": [
+    { "type": "ambient", "name": "ambientLight", "color": "#c4dafa", "intensity": 0.5 },
+    { "type": "directional", "name": "light1", "color": "#ffffff", "intensity": 1.0, "direction": { "x": -1, "y": -1, "z": 1 } }
+  ],
+  "styles": {},
+  "fontCatalogs": []
+}

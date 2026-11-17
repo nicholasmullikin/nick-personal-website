@@ -21,8 +21,6 @@ export default tseslint.config(
       "**/.cache/**",
       "**/coverage/**",
       "pnpm-lock.yaml",
-      "src/components/map3.tsx",
-      "src/components/map4.tsx",
       "static/harp/**",
       "**/gatsby-types.d.ts",
       "gatsby-config.js",
@@ -120,6 +118,25 @@ export default tseslint.config(
             forbiddenPrefixes: ["Query", "Mutation", "Subscription", "Get"],
             forbiddenSuffixes: ["Query", "Mutation", "Subscription"],
           },
+        },
+      ],
+    },
+  },
+  {
+    files: ["scripts/**/*.cjs"],
+    languageOptions: {
+      sourceType: "commonjs",
+      ecmaVersion: "latest",
+      globals: { ...globals.node, ...globals.browser },
+    },
+    rules: {
+      ...eslint.configs.recommended.rules,
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
         },
       ],
     },

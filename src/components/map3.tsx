@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react"
 
 import { Environment, OrbitControls } from "@react-three/drei"
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber"
@@ -20,17 +20,23 @@ function Earth({ displacementScale, wireframe }: EarthProperties) {
   const materialRef = useRef<MeshStandardMaterial>(null)
   const { gl } = useThree()
 
-  const texture = useLoader(TextureLoader, "/img/worldColour.5400x2700.jpg")
+  const sourceTexture = useLoader(
+    TextureLoader,
+    "/img/worldColour.5400x2700.jpg",
+  )
   const displacementMap = useLoader(
     TextureLoader,
     "/img/gebco_bathy_2700x1350.jpg",
   )
 
-  useEffect(() => {
-    texture.colorSpace = SRGBColorSpace
-    texture.anisotropy = gl.capabilities.getMaxAnisotropy()
-    texture.needsUpdate = true
-  }, [texture, gl])
+  const texture = useMemo(() => {
+    const copy = sourceTexture.clone()
+    copy.colorSpace = SRGBColorSpace
+    copy.anisotropy = gl.capabilities.getMaxAnisotropy()
+    copy.needsUpdate = true
+    return copy
+  }, [sourceTexture, gl])
+  useEffect(() => () => texture.dispose(), [texture])
 
   useFrame((_, delta) => {
     if (meshRef.current) {

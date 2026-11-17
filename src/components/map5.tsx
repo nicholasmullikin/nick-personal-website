@@ -9,6 +9,7 @@ export function Map5() {
 
   return (
     <iframe
+      allowFullScreen
       title="harp.gl globe with atmosphere"
       src={src}
       loading="lazy"

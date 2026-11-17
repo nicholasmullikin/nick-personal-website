@@ -23,7 +23,13 @@
     "semantic-release": "semantic-release",
     "lint-staged": "lint-staged",
     "pre-commit": "pnpm lint-staged",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build:maps": "node scripts/maps.cjs build",
+    "typecheck:maps": "node scripts/maps.cjs typecheck",
+    "lint:maps": "node scripts/maps.cjs lint",
+    "test:maps": "node scripts/maps.cjs unit",
+    "test:maps:browser": "node scripts/maps.cjs browser",
+    "format:check:maps": "node scripts/maps.cjs format"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix"
