@@ -65175,9 +65175,15 @@ function createImagery(THREE, map, ds, token, sky, environment) {
                     y: tile.tileKey.row
                 },
                 k = key(tk.z, tk.x, tk.y);
-            for (let z = 0; z <= tk.z; z++) {
+            // A loaded descendant already supplies this tile's fallback. Do not
+            // refill evicted ancestors below it: large fullscreen views otherwise
+            // cycle them through the cache and download them again every frame.
+            for (let z = tk.z; z >= 0; z--) {
                 const div = 2 ** (tk.z - z);
-                request(z, Math.floor(tk.x / div), Math.floor(tk.y / div));
+                const x = Math.floor(tk.x / div),
+                    y = Math.floor(tk.y / div);
+                request(z, x, y);
+                if (cache.has((mode === "c" ? "c:" : "") + key(z, x, y))) break;
             }
             const target = best(tk);
             const edgeMask = [0, 0, 0, 0];

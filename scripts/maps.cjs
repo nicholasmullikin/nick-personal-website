@@ -55,6 +55,7 @@ const workflows = {
   ],
   browser: [
     "check-earth-dynamics",
+    "check-earth-imagery-cache",
     "check-earth-clouds",
     "check-map-continuity",
     "check-earth-layers",

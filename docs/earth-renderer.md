@@ -18,7 +18,7 @@ Harp world coordinates and geometry use meters. Atmosphere shaders use kilometer
 
 The frame order is camera protection, harp tile selection/creation, continuity and uniform preparation, the bounded cloud volume/reconstruction passes, opaque terrain/buildings, sky where depth is unobstructed, and transparent cloud compositing with logarithmic depth. The fallback globe uses a geographic anchor at Earth's center. Background and polar data sources are explicitly disabled because the fallback globe provides that coverage; other application sources are not hidden.
 
-The native geometry cache uses a 200 MiB soft budget shared by data sources. Visible tiles are pinned and may exceed that budget in dense cities. Tests check that unused geometry is evicted rather than requiring visible buildings to disappear. Imagery separately keeps its 160-entry cache and at most eight requests; buildings permit four network requests through an abort-aware provider.
+The native geometry cache uses a 200 MiB soft budget shared by data sources. Visible tiles are pinned and may exceed that budget in dense cities. Tests check that unused geometry is evicted rather than requiring visible buildings to disappear. Imagery separately keeps its 160-entry cache and at most eight requests. Ancestor requests stop at the nearest loaded tile so evicted lower-resolution ancestors are not continuously refetched in large views; buildings permit four network requests through an abort-aware provider.
 
 ## Clouds
 
@@ -46,7 +46,7 @@ The implementation draws on [Guerrilla's Nubis weather/Perlin-Worley approach](h
 
 ## Source release
 
-The renderer source for this deployment is committed in [nicholasmullikin/xyz-threejs, `a2efceb`](https://github.com/nicholasmullikin/xyz-threejs/commit/a2efceb93c4534eb240d565fd5488a9a604c4398), on the `earth-simulator` branch. All 379 recorded build inputs match that source tree. The artifact manifest retains the original local build revision; use its input hashes and this source commit to reproduce the release.
+The renderer source for this deployment is committed in [nicholasmullikin/xyz-threejs, `5fdeeec`](https://github.com/nicholasmullikin/xyz-threejs/commit/5fdeeecf8e6a7bc684c13508480c219e941e4681), on the `earth-simulator` branch. All 379 recorded build inputs match that source tree. The artifact manifest retains the original local build revision; use its input hashes and this source commit to reproduce the release.
 
 ## Build and import
 
