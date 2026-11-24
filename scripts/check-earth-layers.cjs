@@ -93,7 +93,7 @@ async function main() {
       buildingVertices: (() => {
         let count = 0
         window.probe.map.scene.traverse(o => {
-          if (o.material?.uniforms?.groundMap)
+          if (o.material?.userData?.earthBuilding)
             count += o.geometry.attributes.position.count
         })
         return count

@@ -90,7 +90,7 @@ exports.createPages = async ({ graphql, actions }) => {
   })
 }
 
-exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
+exports.onCreateWebpackConfig = ({ stage, loaders, actions, getConfig }) => {
   if (stage === "build-html" || stage === "develop-html") {
     actions.setWebpackConfig({
       module: {
@@ -102,5 +102,50 @@ exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
         ],
       },
     })
+  }
+  if (stage === "build-javascript") {
+    const config = getConfig()
+    const shared = config.optimization.splitChunks.cacheGroups.shared
+    // These two tiny components are shared by the full-screen iframe and the
+    // article demos. Duplicating them avoids pulling the demo's Three and OL
+    // vendor chunk into the full-screen page before it is needed.
+    shared.test = (module, { chunkGraph }) => {
+      if (/[\\/]src[\\/]components[\\/](?:map5|mapGraphics)\.tsx$/.test(module.resource || ""))
+        return false
+      for (const chunk of chunkGraph.getModuleChunksIterable(module))
+        if (chunk.canBeInitial()) return false
+      return module.type !== "css/mini-extract"
+    }
+    const terser = config.optimization.minimizer.find(
+      plugin => plugin.constructor.name === "TerserPlugin",
+    )
+    if (terser) {
+      // Gatsby's Terser version can remove OpenLayers imports that are used
+      // by class inheritance. Keep that optimization for the rest of the site
+      // and disable it only in this lazy vendor chunk.
+      const TerserPlugin = require("node:module").createRequire(
+        require.resolve("gatsby"),
+      )("terser-webpack-plugin")
+      const olChunk = /earth-demo-ol.*\.js$/
+      terser.options.exclude = [terser.options.exclude, olChunk].filter(Boolean)
+      config.optimization.minimizer.push(
+        new TerserPlugin({
+          test: olChunk,
+          parallel: terser.options.parallel,
+          terserOptions: {
+            ...terser.options.minimizer.options,
+            compress: { ...terser.options.minimizer.options.compress, unused: false },
+          },
+        }),
+      )
+      config.optimization.splitChunks.cacheGroups.earthDemoOl = {
+        test: /[\\/]node_modules[\\/]ol[\\/]/,
+        name: "earth-demo-ol",
+        chunks: "all",
+        priority: 40,
+        enforce: true,
+      }
+    }
+    actions.replaceWebpackConfig(config)
   }
 }

@@ -1,3 +1,4 @@
+import "./mapThreeConsole"
 import React, { Suspense, useEffect, useRef, useState } from "react"
 
 import { Environment, OrbitControls } from "@react-three/drei"
@@ -25,8 +26,15 @@ const hiddenMapStyle: React.CSSProperties = {
   zIndex: -1,
 }
 
-function Earth({ olCanvas }: { olCanvas: HTMLCanvasElement | null }) {
+function Earth({
+  olCanvas,
+  revision,
+}: {
+  olCanvas: HTMLCanvasElement | null
+  revision: React.RefObject<number>
+}) {
   const meshRef = useRef<Mesh | null>(null)
+  const uploaded = useRef(-1)
   const textureRef = useRef<THREE.CanvasTexture | null>(null)
 
   useEffect(() => {
@@ -46,8 +54,11 @@ function Earth({ olCanvas }: { olCanvas: HTMLCanvasElement | null }) {
   }, [olCanvas])
 
   useFrame((_, delta) => {
-    if (textureRef.current) textureRef.current.needsUpdate = true
-    if (meshRef.current) meshRef.current.rotation.y += delta / 30
+    if (textureRef.current && uploaded.current !== revision.current) {
+      textureRef.current.needsUpdate = true
+      uploaded.current = revision.current
+    }
+    if (meshRef.current) meshRef.current.rotation.y += Math.min(delta, 0.1) / 30
   })
 
   return (
@@ -58,7 +69,8 @@ function Earth({ olCanvas }: { olCanvas: HTMLCanvasElement | null }) {
   )
 }
 
-export function Map1() {
+export function Map1({ active = true }: { active?: boolean }) {
+  const revision = useRef(0)
   const mapDivRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<Map | null>(null)
   const [olCanvas, setOlCanvas] = useState<HTMLCanvasElement | null>(null)
@@ -92,11 +104,11 @@ export function Map1() {
         .getViewport()
         .querySelector<HTMLCanvasElement>(".ol-layer canvas")
       if (canvas && canvas.width > 0 && canvas.height > 0) {
+        revision.current++
         setOlCanvas(previous => (previous === canvas ? previous : canvas))
       }
     }
-    olMap.on("rendercomplete", grabCanvas)
-    olMap.once("postrender", grabCanvas)
+    olMap.on("postrender", grabCanvas)
 
     return () => {
       olMap.setTarget(undefined)
@@ -115,6 +127,7 @@ export function Map1() {
         data-testid="ol-source-map"
       />
       <Canvas
+        frameloop={active ? "always" : "never"}
         shadows="percentage"
         camera={{ position: [0, 0, 3], fov: 50 }}
         gl={{ antialias: true }}
@@ -129,7 +142,7 @@ export function Map1() {
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
           />
-          <Earth olCanvas={olCanvas} />
+          <Earth olCanvas={olCanvas} revision={revision} />
           <OrbitControls />
         </Suspense>
       </Canvas>

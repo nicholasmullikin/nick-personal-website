@@ -8,3 +8,5 @@ alt: "maps demo"
 ---
 
 This post embeds **four different map components** rendered with five different technologies. They each demonstrate a different rendering pipeline. The final one is the one I've been working on to make a cool tile based globe renderer.
+
+[Open the full-window Earth map](/blog/earth/)

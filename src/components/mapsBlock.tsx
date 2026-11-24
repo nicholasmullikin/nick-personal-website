@@ -1,30 +1,67 @@
-import React, { Suspense } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 
 import styled from "styled-components"
-import { setConsoleFunction } from "three"
-
-import { Map1 } from "~/src/components/map"
-import { Map3 } from "~/src/components/map3"
-import { Map4 } from "~/src/components/map4"
 import { Map5 } from "~/src/components/map5"
 import { MapGraphics } from "~/src/components/mapGraphics"
 
-const SILENCED_THREE_WARNINGS = ["Clock: This module has been deprecated"]
-
-setConsoleFunction((type, message, ...rest) => {
-  if (
-    type === "warn" &&
-    SILENCED_THREE_WARNINGS.some(needle => message.includes(needle))
-  ) {
-    return
-  }
-  const method = (
-    console as unknown as Record<string, (...args: unknown[]) => void>
-  )[type]
-  method?.(message, ...rest)
-})
+const Map1 = React.lazy(() => import("./map").then(m => ({ default: m.Map1 })))
+const Map3 = React.lazy(() => import("./map3").then(m => ({ default: m.Map3 })))
+const Map4 = React.lazy(() => import("./map4").then(m => ({ default: m.Map4 })))
 
 const MapFallback = () => <Fallback>Loading map…</Fallback>
+
+// Keep the camera and controls mounted on return. Only nearby examples start
+// loading, and the two continuously rotating examples draw only while visible.
+function DemoViewport({
+  height = 400,
+  children,
+}: {
+  height?: number
+  children: (visible: boolean) => React.ReactNode
+}) {
+  const root = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const element = root.current
+    if (!element) return
+    let intersects = true
+    const update = () => setVisible(intersects && !document.hidden)
+    update()
+    document.addEventListener("visibilitychange", update)
+    if (!("IntersectionObserver" in window)) {
+      setMounted(true)
+      return () => document.removeEventListener("visibilitychange", update)
+    }
+    const nearby = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setMounted(true)
+          nearby.disconnect()
+        }
+      },
+      { rootMargin: "160px" },
+    )
+    const active = new IntersectionObserver(([entry]) => {
+      intersects = entry.isIntersecting
+      update()
+    })
+    nearby.observe(element)
+    active.observe(element)
+    return () => {
+      nearby.disconnect()
+      active.disconnect()
+      document.removeEventListener("visibilitychange", update)
+    }
+  }, [])
+  return (
+    <div ref={root} data-map-viewport="" style={{ minHeight: height }}>
+      {mounted && (
+        <Suspense fallback={<MapFallback />}>{children(visible)}</Suspense>
+      )}
+    </div>
+  )
+}
 
 const MapsBlock = () => {
   if (typeof window === "undefined") return null
@@ -38,11 +75,13 @@ const MapsBlock = () => {
           <code>&lt;canvas&gt;</code>, then used as a live texture on a Three.js
           sphere. Drag to orbit.
         </Description>
-        <Suspense fallback={<MapFallback />}>
-          <MapGraphics requiresWebGL2>
-            <Map1 />
-          </MapGraphics>
-        </Suspense>
+        <DemoViewport>
+          {visible => (
+            <MapGraphics requiresWebGL2>
+              <Map1 active={visible} />
+            </MapGraphics>
+          )}
+        </DemoViewport>
       </Slot>
       <Slot>
         <h3>2. Three.js earth with displacement</h3>
@@ -51,11 +90,13 @@ const MapsBlock = () => {
           map drives <code>displacementScale</code> and a color map textures the
           surface.
         </Description>
-        <Suspense fallback={<MapFallback />}>
-          <MapGraphics requiresWebGL2>
-            <Map3 />
-          </MapGraphics>
-        </Suspense>
+        <DemoViewport>
+          {visible => (
+            <MapGraphics requiresWebGL2>
+              <Map3 active={visible} />
+            </MapGraphics>
+          )}
+        </DemoViewport>
       </Slot>
       <Slot>
         <h3>3. MapLibre GL — 3D vector tiles</h3>
@@ -67,11 +108,13 @@ const MapsBlock = () => {
           map of New York, with the OSM <code>building</code> vector tile layer
           extruded to actual building heights.
         </Description>
-        <Suspense fallback={<MapFallback />}>
-          <MapGraphics center={[-74.01, 40.707]} zoom={15}>
-            {contextType => <Map4 contextType={contextType} />}
-          </MapGraphics>
-        </Suspense>
+        <DemoViewport>
+          {() => (
+            <MapGraphics center={[-74.01, 40.707]} zoom={15}>
+              {contextType => <Map4 contextType={contextType} />}
+            </MapGraphics>
+          )}
+        </DemoViewport>
       </Slot>
       <Slot>
         <h3>4. Interactive Earth with harp.gl</h3>
@@ -84,11 +127,13 @@ const MapsBlock = () => {
           buttons, or play button to explore the lighting. Clouds and night
           lights use historical NASA composites, not live weather or imagery.
         </Description>
-        <Suspense fallback={<MapFallback />}>
-          <MapGraphics height={500}>
-            <Map5 />
-          </MapGraphics>
-        </Suspense>
+        <DemoViewport height={500}>
+          {() => (
+            <MapGraphics height={500}>
+              <Map5 />
+            </MapGraphics>
+          )}
+        </DemoViewport>
       </Slot>
     </Stack>
   )

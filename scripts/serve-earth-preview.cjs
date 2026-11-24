@@ -30,9 +30,12 @@ function createPreview({
               ".map": "application/json",
               ".json": "application/json",
               ".png": "image/png",
+              ".webp": "image/webp",
               ".jpg": "image/jpeg",
             }[path.extname(file)] || "application/octet-stream",
-          "Cache-Control": "no-store",
+          "Cache-Control": /(?:^|\/)(?:[0-9]+|earth-[a-z0-9-]+|earth-background\.bundle|rendering_globe-atmosphere_bundle)\.[a-f0-9]{12}\.js$/.test(file)
+            ? "public, max-age=31536000, immutable"
+            : "no-store",
         })
         res.end(body)
       } catch {

@@ -76,6 +76,13 @@ async function main() {
         null,
         { polling: 100, timeout: 60000 },
       )
+      for (const viewport of await page.locator("[data-map-viewport]").all()) {
+        await viewport.scrollIntoViewIfNeeded()
+        await viewport
+          .locator("canvas, iframe, [data-testid=map-graphics-fallback]")
+          .first()
+          .waitFor({ state: "attached" })
+      }
       await page.waitForFunction(
         n =>
           document.querySelectorAll('[data-testid="map-graphics-fallback"]')

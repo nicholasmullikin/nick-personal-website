@@ -12,6 +12,7 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
+const EarthMapPage = React.lazy(() => import("~/src/components/earthMapPage"))
 const MapsBlockLazy = React.lazy(() => import("~/src/components/mapsBlock"))
 const GaussianSplatBlockLazy = React.lazy(
   () => import("~/src/components/gaussianSplatBlock"),
@@ -39,11 +40,23 @@ const GaussianSplatBlock: FC<{ slug: string }> = ({ slug }) => {
   )
 }
 
-const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
+const BlogPost: FC<PageProps<Queries.Query>> = ({ data, location }) => {
   const { markdownRemark } = data
   const { frontmatter, html, fields } = markdownRemark!
   const { title, desc, date, category } = frontmatter!
   const slug = fields?.slug ?? ""
+  if (slug === "/blog/earth/") {
+    return (
+      <Layout fullWindow>
+        <main aria-label={title ?? "Interactive Earth"}>
+          <Suspense fallback={null}>
+            <EarthMapPage search={location.search} />
+          </Suspense>
+        </main>
+      </Layout>
+    )
+  }
+
   const diagramMarker = "<!-- X11_FOCUS_DIAGRAM -->"
   const parts =
     slug === "/blog/x11-focus-bug/"
@@ -51,7 +64,7 @@ const BlogPost: FC<PageProps<Queries.Query>> = ({ data }) => {
       : [html ?? ""]
 
   return (
-    <Layout>
+    <Layout earthBackground>
       <main>
         <article>
           <OuterWrapper>

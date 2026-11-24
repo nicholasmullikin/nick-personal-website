@@ -46,3 +46,11 @@ exports.onRenderBody = ({ setHtmlAttributes, setPreBodyComponents }) => {
     }),
   ])
 }
+
+const { EarthBackgroundRoot } = require("./src/components/earthBackground")
+exports.wrapPageElement = ({ element, props }) =>
+  React.createElement(
+    EarthBackgroundRoot,
+    { pathname: props.location.pathname },
+    element,
+  )

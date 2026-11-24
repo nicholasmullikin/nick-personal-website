@@ -267,6 +267,15 @@ exports.replaceHydrateFunction = () => {
 }
 
 module.exports = {
+  // Serve the complete Earth asset tree from its authoritative static
+  // directory in development. Gatsby's watcher can miss nested files after
+  // the verified importer atomically replaces that directory.
+  developMiddleware(app) {
+    app.use(
+      "/harp",
+      require("./scripts/earth-develop-middleware.cjs").createEarthDevelopMiddleware(__dirname + "/static/harp"),
+    )
+  },
   graphqlTypegen: { generateOnBuild: true },
   jsxRuntime: "automatic",
   siteMetadata,

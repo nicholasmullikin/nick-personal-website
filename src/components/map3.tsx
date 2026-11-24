@@ -1,3 +1,4 @@
+import "./mapThreeConsole"
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react"
 
 import { Environment, OrbitControls } from "@react-three/drei"
@@ -40,7 +41,7 @@ function Earth({ displacementScale, wireframe }: EarthProperties) {
 
   useFrame((_, delta) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += delta / 20
+      meshRef.current.rotation.y += Math.min(delta, 0.1) / 20
     }
   })
 
@@ -58,7 +59,7 @@ function Earth({ displacementScale, wireframe }: EarthProperties) {
   )
 }
 
-export function Map3() {
+export function Map3({ active = true }: { active?: boolean }) {
   const [wireframe, setWireframe] = useState(false)
   const [displacementScale, setDisplacementScale] = useState(0.1)
 
@@ -66,7 +67,11 @@ export function Map3() {
 
   return (
     <MapFrame>
-      <Canvas shadows="percentage" camera={{ position: [0, 0, 2.7], fov: 50 }}>
+      <Canvas
+        frameloop={active ? "always" : "never"}
+        shadows="percentage"
+        camera={{ position: [0, 0, 2.7], fov: 50 }}
+      >
         <Suspense fallback={null}>
           <Environment files="/img/venice_sunset_1k.hdr" />
           <ambientLight intensity={0.6} />

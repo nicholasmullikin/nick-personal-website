@@ -29,7 +29,10 @@
     "lint:maps": "node scripts/maps.cjs lint",
     "test:maps": "node scripts/maps.cjs unit",
     "test:maps:browser": "node scripts/maps.cjs browser",
-    "format:check:maps": "node scripts/maps.cjs format"
+    "format:check:maps": "node scripts/maps.cjs format",
+    "build:earth-background": "node scripts/build-earth-background.cjs",
+    "test:earth-refinement": "node scripts/check-earth-refinement.cjs",
+    "test:earth-background": "node scripts/check-earth-background.cjs && node scripts/check-earth-framing.cjs && node scripts/check-earth-interaction.cjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix"

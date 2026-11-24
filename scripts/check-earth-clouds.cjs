@@ -1,3 +1,8 @@
+const {
+  sampleRegionalCloudGradients,
+  sampleCloudDescent,
+  measureCloudPan,
+} = require("./lib/earth-cloud-regional.cjs")
 const { openControls } = require("./lib/earth-browser.cjs")
 // Cloud genera, shell crossings, reconstruction, quality bounds, WebGL 1 fallback.
 const { chromium, firefox } = require("playwright"),
@@ -67,6 +72,12 @@ async function main() {
       await installProbe(page)
       if (name === "no-depth-texture")
         await page.addInitScript(() => {
+          const getContext = HTMLCanvasElement.prototype.getContext
+          HTMLCanvasElement.prototype.getContext = function (name, ...args) {
+            return name === "webgl2"
+              ? null
+              : getContext.call(this, name, ...args)
+          }
           const original = WebGLRenderingContext.prototype.getExtension
           WebGLRenderingContext.prototype.getExtension = function (name) {
             return name === "WEBGL_depth_texture"
@@ -87,7 +98,7 @@ async function main() {
         name === "no-depth-texture"
           ? [9, 10, 1]
           : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-      const { noiseGLSL } = require("./lib/earth-source.cjs").load(
+      const { noiseGLSL, densityGLSL } = require("./lib/earth-source.cjs").load(
         "cloud-model.js",
       )
       const atlas = await page.evaluate(noiseGLSL => {
@@ -128,6 +139,56 @@ async function main() {
             Math.abs(atlas[i * 8 + channel] - atlas[i * 8 + 4 + channel]) < 3,
             "GPU volume samples are continuous across slice rows",
           )
+      const { regions, flat } = await page.evaluate(
+        sampleRegionalCloudGradients,
+        {
+          noiseGLSL,
+          densityGLSL,
+        },
+      )
+      assert.equal(flat.cloudyFraction, 1)
+      assert.equal(
+        flat.cloudyGradient,
+        0,
+        "a flat, fully covered field has no cell detail",
+      )
+      const meanGradient =
+        regions.reduce((sum, r) => sum + r.meanGradient, 0) / regions.length
+      assert.ok(
+        meanGradient > 1.8,
+        `${name}: regional fields retain overall contrast`,
+      )
+      for (const region of regions) {
+        assert.ok(
+          region.cloudyFraction > 0.1,
+          `${name}: regional sample needs resolved clouds at ${region.lat}, ${region.lon}`,
+        )
+        assert.ok(
+          region.cloudyGradient > 1.8,
+          `${name}: regional cloud cells retain detail at ${region.lat}, ${region.lon}`,
+        )
+        assert.ok(
+          region.hardEdges < 0.0005,
+          `${name}: regional cloud density has hard rims at ${region.lat}, ${region.lon}`,
+        )
+      }
+      await page.waitForFunction(
+        () => window.probe.map.earth.environment.status.cloudReady,
+      )
+      const descent = await page.evaluate(sampleCloudDescent, {
+        noiseGLSL,
+        densityGLSL,
+      })
+      for (const [i, result] of descent.entries()) {
+        assert.ok(
+          result.correlation > [0.9, 0.8][i],
+          `${name}: cloud banks moved during descent`,
+        )
+        assert.ok(
+          Math.abs(result.opacityChange) < 0.04,
+          `${name}: cloud cover changed during descent`,
+        )
+      }
       const signatures = []
       for (const id of types) {
         await openControls(page, "Environment")
@@ -274,6 +335,14 @@ async function main() {
         await page.screenshot({
           path: path.join(output, `${name}-${view}.png`),
         })
+      }
+      if (name !== "no-depth-texture") {
+        const pan = await page.evaluate(measureCloudPan)
+        assert.ok(pan.samples > 1000, `${name}: pan check needs visible clouds`)
+        assert.ok(
+          pan.rms < 1,
+          `${name}: pan changed cloud opacity by ${pan.rms}/255 RMS`,
+        )
       }
       await page.getByRole("button", { name: "Earth", exact: true }).click()
       await openControls(page, "Environment")
